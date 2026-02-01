@@ -2,8 +2,8 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA KELVIN v1.1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SISTEMA KELVIN v1.4</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -12,158 +12,132 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
     <style>
-        /* TEMA TECHNO GRAY */
         :root {
-            --bg-dark: #121212;
-            --bg-card: #1e1e1e;
-            --text-main: #e0e0e0;
-            --text-muted: #a0a0a0;
-            --neon-cyan: #00e5ff;
-            --neon-green: #00ff9d;
-            --neon-orange: #ff9100;
-            --neon-purple: #d500f9;
+            --bg-body: #f4f7f6;
+            --bg-sidebar: #2c3e50;
+            --text-main: #333333;
+            --brand-color: #00e5ff;
+            --card-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
-        body { background-color: var(--bg-dark); color: var(--text-main); font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); font-family: 'Segoe UI', sans-serif; }
         
-        /* Login Screen */
+        /* LOGIN */
         #login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #2c3e50 0%, #000000 100%);
+            background: radial-gradient(circle at center, #2c3e50 0%, #1a252f 100%);
             z-index: 9999; display: flex; align-items: center; justify-content: center;
         }
 
-        /* Sidebar & Nav */
-        .sidebar-btn {
-            background: transparent; color: var(--text-muted); border: 1px solid #333;
-            margin-bottom: 10px; text-align: left; transition: 0.3s;
+        /* CARDS */
+        .card-custom {
+            background-color: #ffffff; border: none; border-radius: 10px;
+            box-shadow: var(--card-shadow); margin-bottom: 20px;
         }
-        .sidebar-btn:hover, .sidebar-btn.active {
-            background: rgba(0, 229, 255, 0.1); color: var(--neon-cyan); border-color: var(--neon-cyan);
-            box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
-        }
-
-        /* Cards */
-        .card-techno {
-            background-color: var(--bg-card); border: 1px solid #333; border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-        .card-header-techno { border-bottom: 1px solid #333; padding: 15px; font-weight: bold; color: var(--neon-cyan); }
-
-        /* Inputs & Tables */
+        
+        /* INPUTS */
         .form-control, .form-select {
-            background-color: #2d2d2d; border: 1px solid #444; color: #fff;
+            background-color: #ffffff; border: 1px solid #ced4da; color: #333;
         }
         .form-control:focus {
-            background-color: #333; border-color: var(--neon-cyan); color: #fff; box-shadow: none;
+            border-color: #2c3e50; box-shadow: 0 0 0 0.2rem rgba(44, 62, 80, 0.25);
         }
-        .table-dark-techno {
-            background-color: var(--bg-card); color: var(--text-muted);
-        }
-        .table-dark-techno th { color: var(--neon-cyan); border-bottom: 1px solid #444; }
-        .table-dark-techno td { border-bottom: 1px solid #333; }
 
-        /* Badges */
-        .badge-cyan { background-color: rgba(0, 229, 255, 0.2); color: var(--neon-cyan); border: 1px solid var(--neon-cyan); }
-        .badge-orange { background-color: rgba(255, 145, 0, 0.2); color: var(--neon-orange); border: 1px solid var(--neon-orange); }
+        /* SIDEBAR */
+        .sidebar-btn {
+            width: 100%; text-align: left; background: transparent; color: #ecf0f1;
+            border: none; margin-bottom: 5px; padding: 12px; transition: 0.2s; border-radius: 5px;
+        }
+        .sidebar-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .sidebar-btn.active { background: var(--brand-color); color: #000; font-weight: bold; }
+
+        /* BADGES */
+        .badge-pago { background-color: #27ae60; color: white; }
+        .badge-aberto { background-color: #e74c3c; color: white; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
-    <div class="card card-techno p-5 text-center" style="width: 350px;">
-        <h3 class="mb-4" style="color: var(--neon-cyan);"><i class="fas fa-shield-alt"></i> SISTEMA KELVIN</h3>
-        <input type="password" id="loginPass" class="form-control mb-3 text-center" placeholder="Senha de Acesso">
-        <button onclick="fazerLogin()" id="btnLogin" class="btn btn-outline-info w-100">ENTRAR</button>
-        <small class="text-muted mt-3 d-block">Senha padrão: 1234</small>
+    <div class="card p-4 text-center shadow-lg" style="width: 320px; background: white; border-radius: 15px;">
+        <h4 class="mb-4" style="color: #2c3e50;"><i class="fas fa-shield-alt"></i> KELVIN SYS</h4>
+        <form onsubmit="event.preventDefault(); fazerLogin();">
+            <input type="password" id="loginPass" class="form-control mb-3 text-center" placeholder="Senha" autofocus>
+            <button type="submit" class="btn btn-dark w-100 fw-bold">ENTRAR</button>
+        </form>
+        <small class="text-muted mt-3 d-block">Senha: 1234</small>
     </div>
 </div>
 
 <div id="app-content" class="container-fluid d-none">
     <div class="row min-vh-100">
         
-        <div class="col-md-2 p-3 d-flex flex-column" style="background-color: #0f0f0f; border-right: 1px solid #333;">
-            <h5 class="text-center mb-4 mt-2" style="color: #fff; letter-spacing: 2px;">KELVIN<span style="color:var(--neon-cyan)">ME</span></h5>
-            
-            <button class="btn sidebar-btn active" onclick="nav('dashboard')"><i class="fas fa-chart-line me-2"></i> Dashboard</button>
-            <button class="btn sidebar-btn" onclick="nav('estoque')"><i class="fas fa-box me-2"></i> Estoque & Custo</button>
-            <button class="btn sidebar-btn" onclick="nav('orcamento')"><i class="fas fa-file-contract me-2"></i> Orçamento</button>
-            <button class="btn sidebar-btn" onclick="nav('financeiro')"><i class="fas fa-wallet me-2"></i> Financeiro</button>
+        <div class="col-md-2 p-3 d-none d-md-block" style="background-color: var(--bg-sidebar);">
+            <h5 class="text-center mb-4 text-white mt-2">KELVIN<span style="color:var(--brand-color)">SYS</span></h5>
+            <button class="btn sidebar-btn active" onclick="nav('dashboard')"><i class="fas fa-chart-pie me-2"></i> Dashboard</button>
+            <button class="btn sidebar-btn" onclick="nav('financeiro')"><i class="fas fa-file-invoice-dollar me-2"></i> Financeiro</button>
+            <button class="btn sidebar-btn" onclick="nav('orcamento')"><i class="fas fa-plus-circle me-2"></i> Novo Contrato</button>
+            <button class="btn sidebar-btn" onclick="nav('estoque')"><i class="fas fa-boxes me-2"></i> Estoque</button>
             <button class="btn sidebar-btn" onclick="nav('clientes')"><i class="fas fa-users me-2"></i> Clientes</button>
-            
-            <div class="mt-auto text-center small text-muted">
-                v1.1 Techno<br>CNPJ: 52.975.677/0001-49
-            </div>
+        </div>
+
+        <div class="col-12 d-md-none bg-dark p-2 d-flex justify-content-between align-items-center text-white">
+            <span class="fw-bold">KELVIN SYSTEM</span>
+            <button class="btn btn-sm btn-outline-light" type="button" data-bs-toggle="collapse" data-bs-target="#menuMobile">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <div class="collapse w-100 d-md-none bg-dark" id="menuMobile">
+            <button class="btn sidebar-btn" onclick="nav('dashboard')">Dashboard</button>
+            <button class="btn sidebar-btn" onclick="nav('financeiro')">Financeiro</button>
+            <button class="btn sidebar-btn" onclick="nav('orcamento')">Novo Contrato</button>
+            <button class="btn sidebar-btn" onclick="nav('estoque')">Estoque</button>
         </div>
 
         <div class="col-md-10 p-4">
             
             <div id="page-dashboard" class="page-section">
-                <h3 class="mb-4">Visão Geral Financeira</h3>
+                <h3 class="mb-4 text-dark">Painel de Lucratividade</h3>
                 <div class="row g-3 mb-4">
                     <div class="col-md-4">
-                        <div class="card card-techno p-3">
-                            <span class="text-muted small">LUCRO LÍQUIDO (VENDAS)</span>
-                            <h2 style="color: var(--neon-green)" id="dashLucro">R$ 0,00</h2>
-                            <small class="text-muted">Venda - Custo dos Produtos</small>
+                        <div class="card card-custom p-3 border-start border-5 border-success">
+                            <span class="text-muted small fw-bold">LUCRO VENDAS (LÍQUIDO)</span>
+                            <h2 class="text-success" id="dashLucro">R$ 0,00</h2>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="card card-techno p-3">
-                            <span class="text-muted small">PATRIMÔNIO ALUGADO (EM RUA)</span>
-                            <h2 style="color: var(--neon-orange)" id="dashPatrimonio">R$ 0,00</h2>
-                            <small class="text-muted">Custo de equipamentos em Clientes</small>
+                        <div class="card card-custom p-3 border-start border-5 border-warning">
+                            <span class="text-muted small fw-bold">PATRIMÔNIO EM RUA</span>
+                            <h2 class="text-warning" id="dashPatrimonio">R$ 0,00</h2>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="card card-techno p-3">
-                            <span class="text-muted small">RECEITA MENSAL (CONTRATOS)</span>
-                            <h2 style="color: var(--neon-cyan)" id="dashRecorrencia">R$ 0,00</h2>
-                            <small class="text-muted">Total Aluguel + Streaming</small>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="card card-techno p-3">
-                            <h6 class="card-header-techno border-0 p-0 mb-3">Performance Financeira</h6>
-                            <canvas id="graficoLucro" height="120"></canvas>
+                        <div class="card card-custom p-3 border-start border-5 border-primary">
+                            <span class="text-muted small fw-bold">RECEITA RECORRENTE</span>
+                            <h2 class="text-primary" id="dashRecorrencia">R$ 0,00</h2>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div id="page-estoque" class="page-section d-none">
-                <div class="card card-techno p-4 mb-4">
-                    <h5 class="text-info mb-3">Cadastro de Produto</h5>
-                    <div class="row g-2">
-                        <div class="col-md-4">
-                            <label class="small text-muted">Nome do Item</label>
-                            <input type="text" id="prodNome" class="form-control">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="small text-muted">Custo (Compra)</label>
-                            <input type="number" id="prodCusto" class="form-control" placeholder="R$ 0.00">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="small text-muted">Venda (Preço)</label>
-                            <input type="number" id="prodVenda" class="form-control" placeholder="R$ 0.00">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="small text-muted">Qtd Estoque</label>
-                            <input type="number" id="prodQtd" class="form-control">
-                        </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button onclick="salvarProduto()" class="btn btn-outline-info w-100">Salvar</button>
-                        </div>
-                    </div>
+            <div id="page-financeiro" class="page-section d-none">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="text-dark">Controle Financeiro</h3>
+                    <button onclick="gerarFaturasDoMes()" class="btn btn-primary shadow-sm"><i class="fas fa-sync"></i> Gerar Cobranças do Mês</button>
                 </div>
 
-                <div class="card card-techno">
-                    <table class="table table-dark-techno m-0">
-                        <thead><tr><th>Item</th><th>Custo (Un)</th><th>Venda (Un)</th><th>Margem</th><th>Estoque</th></tr></thead>
-                        <tbody id="tabelaEstoque"></tbody>
+                <p class="mb-1 text-muted small fw-bold">Filtrar por Categoria:</p>
+                <div class="btn-group mb-3 w-100 shadow-sm">
+                    <button class="btn btn-light border" onclick="filtrarCategoria('TODOS', this)">Geral</button>
+                    <button class="btn btn-light border text-primary" onclick="filtrarCategoria('VENDA', this)">Vendas</button>
+                    <button class="btn btn-light border text-warning" onclick="filtrarCategoria('ALUGUEL', this)">Aluguéis</button>
+                    <button class="btn btn-light border" style="color: #6f42c1;" onclick="filtrarCategoria('STREAMING', this)">Streaming</button>
+                </div>
+
+                <div class="card card-custom table-responsive">
+                    <table class="table table-hover m-0">
+                        <thead class="table-light"><tr><th>Vencimento</th><th>Cliente</th><th>Descrição</th><th>Valor</th><th>Status</th></tr></thead>
+                        <tbody id="listaFaturas"></tbody>
                     </table>
                 </div>
             </div>
@@ -171,80 +145,77 @@
             <div id="page-orcamento" class="page-section d-none">
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="card card-techno p-3">
-                            <h5 class="card-header-techno p-0 pb-2 mb-3">Configurar Pedido</h5>
+                        <div class="card card-custom p-3">
+                            <h5 class="text-primary mb-3">Novo Pedido</h5>
+                            <label class="text-muted small fw-bold">Cliente</label>
+                            <select id="selCliente" class="form-select mb-2"></select>
                             
-                            <label class="small text-muted">Cliente</label>
-                            <select id="selCliente" class="form-select mb-3"></select>
-                            
-                            <label class="small text-muted">Tipo de Contrato</label>
-                            <select id="tipoContrato" class="form-select mb-3 text-warning fw-bold" onchange="toggleMensalidade()">
-                                <option value="VENDA">Venda & Instalação (Único)</option>
-                                <option value="ALUGUEL">Locação de Equipamentos (Mensal)</option>
-                                <option value="STREAMING">Streaming/Nuvem (Mensal)</option>
+                            <label class="text-muted small fw-bold">Tipo</label>
+                            <select id="tipoContrato" class="form-select mb-2" onchange="toggleMensalidade()">
+                                <option value="VENDA">Venda (Única)</option>
+                                <option value="ALUGUEL">Aluguel (Mensal)</option>
+                                <option value="STREAMING">Streaming (Mensal)</option>
                             </select>
 
-                            <div id="divMensalidade" class="d-none p-2 border border-secondary rounded mb-3">
-                                <label class="small text-info">Valor Mensal Acordado</label>
-                                <input type="number" id="valorMensal" class="form-control border-info">
+                            <div id="divMensalidade" class="d-none mb-2 bg-light p-2 border rounded">
+                                <label class="text-danger small fw-bold">Valor Mensal (R$)</label>
+                                <input type="number" id="valorMensal" class="form-control">
                             </div>
 
-                            <hr class="border-secondary">
-                            
-                            <label class="small text-muted">Adicionar Item</label>
+                            <hr>
+                            <label class="text-muted small fw-bold">Adicionar Item</label>
                             <select id="selProdOrc" class="form-select mb-2"></select>
-                            <div class="d-flex gap-2">
+                            <div class="input-group">
                                 <input type="number" id="qtdItem" class="form-control" value="1" placeholder="Qtd">
-                                <button onclick="addCarrinho()" class="btn btn-info">+</button>
+                                <button onclick="addCarrinho()" class="btn btn-secondary">+</button>
                             </div>
                         </div>
                     </div>
-
                     <div class="col-md-8">
-                        <div class="card card-techno p-3">
+                        <div class="card card-custom p-3">
                             <div class="d-flex justify-content-between">
-                                <h5>Itens Selecionados</h5>
-                                <h4 id="displayTotal" class="text-info">R$ 0,00</h4>
+                                <h5>Itens do Pedido</h5>
+                                <h4 id="displayTotal" class="text-primary fw-bold">R$ 0,00</h4>
                             </div>
-                            <table class="table table-dark-techno mt-3">
-                                <thead><tr><th>Item</th><th>Qtd</th><th>Total Venda</th><th>Ação</th></tr></thead>
+                            <table class="table table-striped mt-3">
+                                <thead><tr><th>Item</th><th>Qtd</th><th>Subtotal</th><th></th></tr></thead>
                                 <tbody id="tabelaCarrinho"></tbody>
                             </table>
-                            <div class="text-end mt-3">
-                                <button onclick="finalizarPedido()" class="btn btn-success btn-lg">FINALIZAR & GERAR</button>
-                            </div>
+                            <button onclick="finalizarPedido()" class="btn btn-success w-100 mt-3 fw-bold">SALVAR PEDIDO & GERAR PDF</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div id="page-financeiro" class="page-section d-none">
-                <div class="btn-group mb-4">
-                    <button class="btn btn-outline-secondary active" onclick="renderFinanceiro('TODOS')">Geral</button>
-                    <button class="btn btn-outline-info" onclick="renderFinanceiro('VENDA')">Vendas</button>
-                    <button class="btn btn-outline-warning" onclick="renderFinanceiro('ALUGUEL')">Aluguéis</button>
+            <div id="page-estoque" class="page-section d-none">
+                <div class="card card-custom p-4 mb-3">
+                    <h5 class="mb-3">Cadastro de Produto</h5>
+                    <div class="row g-2">
+                        <div class="col-md-3"><input type="text" id="prodNome" class="form-control" placeholder="Nome do Item"></div>
+                        <div class="col-md-2"><input type="number" id="prodCusto" class="form-control" placeholder="Custo (R$)"></div>
+                        <div class="col-md-2"><input type="number" id="prodVenda" class="form-control" placeholder="Venda (R$)"></div>
+                        <div class="col-md-2"><input type="number" id="prodQtd" class="form-control" placeholder="Qtd"></div>
+                        <div class="col-md-3"><button onclick="salvarProduto()" class="btn btn-primary w-100">Cadastrar</button></div>
+                    </div>
                 </div>
-
-                <div class="card card-techno">
-                    <table class="table table-dark-techno m-0">
-                        <thead><tr><th>Data</th><th>Cliente</th><th>Tipo</th><th>Valor</th><th>Status</th></tr></thead>
-                        <tbody id="tabelaFinanceiro"></tbody>
+                <div class="card card-custom table-responsive">
+                    <table class="table table-hover m-0">
+                        <thead class="table-light"><tr><th>Item</th><th>Custo</th><th>Venda</th><th>Margem</th><th>Estoque</th></tr></thead>
+                        <tbody id="tabelaEstoque"></tbody>
                     </table>
                 </div>
             </div>
 
             <div id="page-clientes" class="page-section d-none">
-                <div class="card card-techno p-4 mb-3">
-                    <div class="row g-2">
-                        <div class="col-md-6"><input type="text" id="cliNome" class="form-control" placeholder="Nome do Cliente"></div>
-                        <div class="col-md-4"><input type="text" id="cliDoc" class="form-control" placeholder="CPF/CNPJ"></div>
-                        <div class="col-md-2"><button onclick="salvarCliente()" class="btn btn-outline-info w-100">Cadastrar</button></div>
-                        <div class="col-md-12"><input type="text" id="cliEnd" class="form-control" placeholder="Endereço Completo"></div>
+                <div class="card card-custom p-4 mb-3">
+                    <h5 class="mb-3">Novo Cliente</h5>
+                    <div class="input-group">
+                        <input type="text" id="cliNome" class="form-control" placeholder="Nome Completo">
+                        <input type="text" id="cliDoc" class="form-control" placeholder="CPF/CNPJ">
+                        <button onclick="salvarCliente()" class="btn btn-primary">Salvar</button>
                     </div>
                 </div>
-                <div class="card card-techno">
-                    <ul id="listaClientes" class="list-group list-group-flush bg-transparent"></ul>
-                </div>
+                <ul id="listaClientes" class="list-group shadow-sm"></ul>
             </div>
 
         </div>
@@ -252,20 +223,22 @@
 </div>
 
 <script>
-    // --- 1. BANCO DE DADOS LOCAL (SIMULAÇÃO) ---
+    // --- BANCO DE DADOS ---
     const DB = {
-        clientes: JSON.parse(localStorage.getItem('db_clientes')) || [],
-        produtos: JSON.parse(localStorage.getItem('db_produtos')) || [],
-        pedidos: JSON.parse(localStorage.getItem('db_pedidos')) || []
+        clientes: JSON.parse(localStorage.getItem('k14_clientes')) || [],
+        produtos: JSON.parse(localStorage.getItem('k14_produtos')) || [],
+        contratos: JSON.parse(localStorage.getItem('k14_contratos')) || [],
+        faturas: JSON.parse(localStorage.getItem('k14_faturas')) || []
     };
 
     function saveDB() {
-        localStorage.setItem('db_clientes', JSON.stringify(DB.clientes));
-        localStorage.setItem('db_produtos', JSON.stringify(DB.produtos));
-        localStorage.setItem('db_pedidos', JSON.stringify(DB.pedidos));
+        localStorage.setItem('k14_clientes', JSON.stringify(DB.clientes));
+        localStorage.setItem('k14_produtos', JSON.stringify(DB.produtos));
+        localStorage.setItem('k14_contratos', JSON.stringify(DB.contratos));
+        localStorage.setItem('k14_faturas', JSON.stringify(DB.faturas));
     }
 
-    // --- 2. LOGIN (ATUALIZADO COM TECLA ENTER) ---
+    // --- LOGIN ---
     function fazerLogin() {
         const pass = document.getElementById('loginPass').value;
         if(pass === '1234') {
@@ -273,293 +246,256 @@
             document.getElementById('app-content').classList.remove('d-none');
             initSystem();
         } else {
-            alert('Senha incorreta! Tente 1234');
+            alert('Senha incorreta!');
         }
     }
 
-    // Detectar Tecla ENTER no campo de senha
-    const inputLogin = document.getElementById("loginPass");
-    if(inputLogin) {
-        inputLogin.addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                fazerLogin();
-            }
-        });
-    }
-
-    // --- 3. NAVEGAÇÃO ---
-    function nav(pageId) {
-        document.querySelectorAll('.page-section').forEach(el => el.classList.add('d-none'));
-        document.getElementById('page-' + pageId).classList.remove('d-none');
-        
-        document.querySelectorAll('.sidebar-btn').forEach(btn => btn.classList.remove('active'));
+    // --- NAVEGAÇÃO ---
+    function nav(page) {
+        document.querySelectorAll('.page-section').forEach(p => p.classList.add('d-none'));
+        document.getElementById('page-' + page).classList.remove('d-none');
+        document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
         event.currentTarget.classList.add('active');
-
-        if(pageId === 'dashboard') updateDashboard();
-        if(pageId === 'financeiro') renderFinanceiro('TODOS');
+        
+        const menu = document.getElementById('menuMobile');
+        if(menu.classList.contains('show')) new bootstrap.Collapse(menu).hide();
+        
+        if(page === 'dashboard') updateDashboard();
+        if(page === 'financeiro') { filtroCat = 'TODOS'; renderFinanceiro(); }
     }
 
-    // --- 4. FUNÇÕES DE CADASTRO ---
+    // --- CADASTROS ---
     function salvarProduto() {
-        const p = {
+        DB.produtos.push({
             id: Date.now(),
             nome: document.getElementById('prodNome').value,
             custo: parseFloat(document.getElementById('prodCusto').value) || 0,
             venda: parseFloat(document.getElementById('prodVenda').value) || 0,
             qtd: parseInt(document.getElementById('prodQtd').value) || 0
-        };
-        DB.produtos.push(p);
-        saveDB();
-        renderEstoque();
-        alert('Produto Salvo!');
+        });
+        saveDB(); renderEstoque(); alert('Produto Salvo!');
         document.getElementById('prodNome').value = '';
     }
 
     function renderEstoque() {
-        const tbody = document.getElementById('tabelaEstoque');
+        const tb = document.getElementById('tabelaEstoque');
         const sel = document.getElementById('selProdOrc');
-        tbody.innerHTML = '';
-        sel.innerHTML = '<option value="">Selecione...</option>';
-
+        tb.innerHTML = ''; sel.innerHTML = '<option value="">Selecione...</option>';
+        
         DB.produtos.forEach(p => {
             const lucro = p.venda - p.custo;
-            const margem = p.venda > 0 ? ((lucro / p.venda) * 100).toFixed(0) : 0;
+            const margem = p.venda > 0 ? ((lucro/p.venda)*100).toFixed(0) : 0;
+            const corMargem = margem < 30 ? 'text-danger' : 'text-success';
             
-            // Tabela
-            tbody.innerHTML += `
-                <tr>
-                    <td>${p.nome}</td>
-                    <td>R$ ${p.custo.toFixed(2)}</td>
-                    <td>R$ ${p.venda.toFixed(2)}</td>
-                    <td class="${margem < 30 ? 'text-danger' : 'text-success'}">${margem}%</td>
-                    <td>${p.qtd}</td>
-                </tr>
-            `;
-
-            // Select Orçamento
-            sel.innerHTML += `<option value="${p.id}" data-venda="${p.venda}" data-custo="${p.custo}">${p.nome}</option>`;
+            tb.innerHTML += `<tr>
+                <td>${p.nome}</td>
+                <td>R$ ${p.custo.toFixed(2)}</td>
+                <td>R$ ${p.venda.toFixed(2)}</td>
+                <td class="${corMargem} fw-bold">${margem}%</td>
+                <td>${p.qtd}</td>
+            </tr>`;
+            sel.innerHTML += `<option value="${p.id}">${p.nome}</option>`;
         });
     }
 
     function salvarCliente() {
-        const c = {
+        DB.clientes.push({
             id: Date.now(),
             nome: document.getElementById('cliNome').value,
-            doc: document.getElementById('cliDoc').value,
-            end: document.getElementById('cliEnd').value
-        };
-        DB.clientes.push(c);
-        saveDB();
-        renderClientes();
+            doc: document.getElementById('cliDoc').value
+        });
+        saveDB(); renderClientes(); alert('Cliente Salvo!');
     }
 
     function renderClientes() {
         const ul = document.getElementById('listaClientes');
         const sel = document.getElementById('selCliente');
-        ul.innerHTML = '';
-        sel.innerHTML = '<option value="">Selecione...</option>';
-
+        ul.innerHTML = ''; sel.innerHTML = '<option value="">Selecione...</option>';
         DB.clientes.forEach(c => {
-            ul.innerHTML += `<li class="list-group-item bg-transparent text-white border-secondary">${c.nome} - ${c.doc}</li>`;
+            ul.innerHTML += `<li class="list-group-item">${c.nome} <small class="text-muted">(${c.doc})</small></li>`;
             sel.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
         });
     }
 
-    // --- 5. ORÇAMENTO ---
+    // --- ORÇAMENTOS ---
     let carrinho = [];
-
     function toggleMensalidade() {
         const tipo = document.getElementById('tipoContrato').value;
         const div = document.getElementById('divMensalidade');
-        if(tipo === 'VENDA') div.classList.add('d-none');
-        else div.classList.remove('d-none');
+        if(tipo === 'VENDA') div.classList.add('d-none'); else div.classList.remove('d-none');
     }
 
     function addCarrinho() {
-        const sel = document.getElementById('selProdOrc');
-        if(!sel.value) return;
-        
-        const id = parseInt(sel.value);
-        const prod = DB.produtos.find(p => p.id === id);
-        const qtd = parseInt(document.getElementById('qtdItem').value);
-
-        carrinho.push({ ...prod, qtdCarrinho: qtd });
-        renderCarrinho();
+        const pid = parseInt(document.getElementById('selProdOrc').value);
+        const prod = DB.produtos.find(p => p.id === pid);
+        if(prod) {
+            carrinho.push({...prod, qtdCarrinho: parseInt(document.getElementById('qtdItem').value)});
+            renderCarrinho();
+        }
     }
 
     function renderCarrinho() {
-        const tbody = document.getElementById('tabelaCarrinho');
-        tbody.innerHTML = '';
+        const tb = document.getElementById('tabelaCarrinho');
+        tb.innerHTML = '';
         let total = 0;
-
         carrinho.forEach((item, idx) => {
-            const subtotal = item.venda * item.qtdCarrinho;
-            total += subtotal;
-            tbody.innerHTML += `<tr><td>${item.nome}</td><td>${item.qtdCarrinho}</td><td>R$ ${subtotal.toFixed(2)}</td><td><button onclick="carrinho.splice(${idx},1);renderCarrinho()" class="btn btn-sm btn-danger">X</button></td></tr>`;
+            total += item.venda * item.qtdCarrinho;
+            tb.innerHTML += `<tr><td>${item.nome}</td><td>${item.qtdCarrinho}</td><td>R$ ${(item.venda*item.qtdCarrinho).toFixed(2)}</td><td><button onclick="carrinho.splice(${idx},1);renderCarrinho()" class="btn btn-sm btn-outline-danger">X</button></td></tr>`;
         });
-
-        // Se for Aluguel, o total exibido é o da mensalidade, não das peças
+        
         const tipo = document.getElementById('tipoContrato').value;
         if(tipo !== 'VENDA') {
-            const mensal = parseFloat(document.getElementById('valorMensal').value) || 0;
-            document.getElementById('displayTotal').innerText = `Mensal: R$ ${mensal.toFixed(2)}`;
-            document.getElementById('displayTotal').classList.replace('text-info', 'text-warning');
+            const men = document.getElementById('valorMensal').value;
+            document.getElementById('displayTotal').innerText = `Mensal: R$ ${men}`;
         } else {
             document.getElementById('displayTotal').innerText = `Total: R$ ${total.toFixed(2)}`;
-            document.getElementById('displayTotal').classList.replace('text-warning', 'text-info');
         }
     }
 
     function finalizarPedido() {
         const cliId = document.getElementById('selCliente').value;
-        if(!cliId) return alert('Selecione o Cliente');
-
-        const tipo = document.getElementById('tipoContrato').value;
-        const mensal = parseFloat(document.getElementById('valorMensal').value) || 0;
+        if(!cliId) return alert('Selecione Cliente');
         
-        // Calcula Custo Total do Pedido (para saber lucro ou investimento)
-        const custoTotalItens = carrinho.reduce((acc, item) => acc + (item.custo * item.qtdCarrinho), 0);
-        const vendaTotalItens = carrinho.reduce((acc, item) => acc + (item.venda * item.qtdCarrinho), 0);
-
-        const pedido = {
+        const tipo = document.getElementById('tipoContrato').value;
+        const valMensal = parseFloat(document.getElementById('valorMensal').value) || 0;
+        
+        const custoItens = carrinho.reduce((a,b) => a + (b.custo*b.qtdCarrinho), 0);
+        const vendaItens = carrinho.reduce((a,b) => a + (b.venda*b.qtdCarrinho), 0);
+        
+        const contrato = {
             id: Date.now(),
             data: new Date().toISOString(),
             clienteId: parseInt(cliId),
             tipo: tipo,
             itens: carrinho,
-            custoTotal: custoTotalItens, // Quanto você gastou nas peças
-            valorFinal: (tipo === 'VENDA') ? vendaTotalItens : mensal, // Quanto vai entrar
-            status: 'APROVADO'
+            custoTotal: custoItens,
+            valorFinal: (tipo === 'VENDA') ? vendaItens : valMensal
         };
 
-        DB.pedidos.push(pedido);
-        
-        // Baixa de Estoque
-        carrinho.forEach(itemC => {
-            const p = DB.produtos.find(prod => prod.id === itemC.id);
-            if(p) p.qtd -= itemC.qtdCarrinho;
+        carrinho.forEach(c => {
+            const p = DB.produtos.find(prod => prod.id === c.id);
+            if(p) p.qtd -= c.qtdCarrinho;
         });
 
-        saveDB();
-        alert('Pedido Salvo!');
-        carrinho = [];
-        renderCarrinho();
-        renderEstoque();
-        gerarPDF(pedido);
-    }
-
-    // --- 6. DASHBOARD INTELIGENTE ---
-    function updateDashboard() {
-        let lucroVendas = 0;
-        let patrimonioRua = 0;
-        let receitaMensal = 0;
-
-        DB.pedidos.forEach(p => {
-            if(p.tipo === 'VENDA') {
-                // Lucro = Valor Pago pelo Cliente - Custo das Peças
-                lucroVendas += (p.valorFinal - p.custoTotal);
-            } else {
-                // Aluguel/Streaming
-                // Custo das peças vira "Patrimônio Alugado"
-                patrimonioRua += p.custoTotal;
-                // Valor da mensalidade entra na receita recorrente
-                receitaMensal += p.valorFinal;
-            }
-        });
-
-        document.getElementById('dashLucro').innerText = `R$ ${lucroVendas.toFixed(2)}`;
-        document.getElementById('dashPatrimonio').innerText = `R$ ${patrimonioRua.toFixed(2)}`;
-        document.getElementById('dashRecorrencia').innerText = `R$ ${receitaMensal.toFixed(2)}`;
-        
-        // Render Chart
-        new Chart(document.getElementById('graficoLucro'), {
-            type: 'bar',
-            data: {
-                labels: ['Lucro Vendas', 'Patrimônio Ativo', 'Receita Mensal'],
-                datasets: [{
-                    label: 'Financeiro',
-                    data: [lucroVendas, patrimonioRua, receitaMensal],
-                    backgroundColor: ['#00ff9d', '#ff9100', '#00e5ff']
-                }]
-            },
-            options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#333' } } } }
-        });
-    }
-
-    // --- 7. FINANCEIRO & PDF ---
-    function renderFinanceiro(filtro) {
-        const tb = document.getElementById('tabelaFinanceiro');
-        tb.innerHTML = '';
-        
-        DB.pedidos.forEach(p => {
-            if(filtro !== 'TODOS' && p.tipo !== filtro) return;
-            const cli = DB.clientes.find(c => c.id === p.clienteId);
-            
-            tb.innerHTML += `
-                <tr>
-                    <td>${new Date(p.data).toLocaleDateString()}</td>
-                    <td>${cli ? cli.nome : 'Excluído'}</td>
-                    <td><span class="badge badge-${p.tipo === 'VENDA' ? 'cyan' : 'orange'}">${p.tipo}</span></td>
-                    <td>R$ ${p.valorFinal.toFixed(2)}</td>
-                    <td class="text-success">APROVADO</td>
-                </tr>
-            `;
-        });
-    }
-
-    function gerarPDF(pedido) {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        const cli = DB.clientes.find(c => c.id === pedido.clienteId);
-
-        // Header Dark
-        doc.setFillColor(30, 30, 30);
-        doc.rect(0, 0, 210, 40, 'F');
-        doc.setTextColor(0, 229, 255); // Cyan
-        doc.setFontSize(20);
-        doc.text("KELVIN EDUARDO", 14, 20);
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(10);
-        doc.text("Soluções em Segurança Eletrônica", 14, 26);
-        doc.text("CNPJ: 52.975.677/0001-49", 140, 20);
-        doc.text("Jardinópolis - SP", 140, 26);
-
-        // Body
-        doc.setTextColor(0,0,0);
-        doc.text(`CLIENTE: ${cli.nome}`, 14, 50);
-        doc.text(`TIPO CONTRATO: ${pedido.tipo}`, 14, 56);
-
-        const rows = pedido.itens.map(i => [i.nome, i.qtdCarrinho, `R$ ${i.venda}`]);
-        doc.autoTable({
-            startY: 65,
-            head: [['Item', 'Qtd', 'Unit']],
-            body: rows,
-            theme: 'grid'
-        });
-
-        const finalY = doc.lastAutoTable.finalY + 10;
-        doc.setFontSize(14);
-        if(pedido.tipo === 'VENDA') {
-            doc.text(`TOTAL A PAGAR: R$ ${pedido.valorFinal.toFixed(2)}`, 14, finalY);
+        if(tipo === 'VENDA') {
+            DB.faturas.push({
+                id: Date.now(), contratoId: contrato.id, clienteId: contrato.clienteId,
+                descricao: 'Venda Instalação', valor: contrato.valorFinal,
+                vencimento: new Date().toLocaleDateString(), status: 'ABERTO'
+            });
         } else {
-            doc.setTextColor(200, 0, 0);
-            doc.text(`MENSALIDADE: R$ ${pedido.valorFinal.toFixed(2)}`, 14, finalY);
-            doc.setFontSize(10);
-            doc.setTextColor(100, 100, 100);
-            doc.text("Equipamentos em regime de comodato (propriedade da empresa).", 14, finalY + 8);
+            DB.contratos.push(contrato);
         }
 
-        doc.save(`Pedido_${pedido.id}.pdf`);
+        saveDB(); alert('Pedido Salvo!'); carrinho=[]; renderEstoque(); nav('dashboard');
+        gerarPDF(contrato);
     }
 
-    // Inicialização
-    function initSystem() {
-        renderEstoque();
-        renderClientes();
-        updateDashboard();
+    // --- FINANCEIRO (FILTROS NOVOS) ---
+    let filtroCat = 'TODOS';
+
+    function filtrarCategoria(cat, btn) {
+        filtroCat = cat;
+        // Atualiza visual dos botões
+        const botoes = btn.parentElement.querySelectorAll('button');
+        botoes.forEach(b => b.classList.remove('active', 'fw-bold'));
+        btn.classList.add('active', 'fw-bold');
+        
+        renderFinanceiro();
     }
+
+    function generatingFaturasMes() {
+        const hoje = new Date();
+        const ref = `${hoje.getMonth()+1}/${hoje.getFullYear()}`;
+        let c = 0;
+        DB.contratos.forEach(contr => {
+            if(contr.tipo === 'VENDA') return;
+            const existe = DB.faturas.find(f => f.contratoId === contr.id && f.ref === ref);
+            if(!existe) {
+                DB.faturas.push({
+                    id: Date.now() + Math.random(),
+                    contratoId: contr.id, clienteId: contr.clienteId,
+                    descricao: `Mensalidade ${contr.tipo} - ${ref}`,
+                    valor: contr.valorFinal, vencimento: `10/${ref}`, ref: ref, status: 'ABERTO'
+                });
+                c++;
+            }
+        });
+        saveDB(); renderFinanceiro(); alert(`${c} Faturas Geradas!`);
+    }
+    window.gerarFaturasDoMes = generatingFaturasMes;
+
+    function darBaixa(id) {
+        const f = DB.faturas.find(x => x.id == id);
+        if(f) { f.status = 'PAGO'; f.dtPag = new Date().toLocaleDateString(); saveDB(); renderFinanceiro(); }
+    }
+
+    function renderFinanceiro() {
+        const tb = document.getElementById('listaFaturas');
+        tb.innerHTML = '';
+        DB.faturas.forEach(f => {
+            // Filtro por Categoria (Texto na descrição)
+            if(filtroCat !== 'TODOS') {
+                if(filtroCat === 'VENDA' && !f.descricao.toUpperCase().includes('VENDA')) return;
+                if(filtroCat === 'ALUGUEL' && !f.descricao.toUpperCase().includes('ALUGUEL')) return;
+                if(filtroCat === 'STREAMING' && !f.descricao.toUpperCase().includes('STREAMING')) return;
+            }
+
+            const cli = DB.clientes.find(c => c.id === f.clienteId);
+            const btn = f.status === 'ABERTO' 
+                ? `<button onclick="darBaixa(${f.id})" class="btn btn-sm btn-outline-success">RECEBER</button>` 
+                : `<span class="badge badge-pago">PAGO ${f.dtPag}</span>`;
+            
+            tb.innerHTML += `<tr>
+                <td>${f.vencimento}</td><td>${cli ? cli.nome : '?'}</td><td>${f.descricao}</td>
+                <td>R$ ${f.valor.toFixed(2)}</td><td>${btn}</td>
+            </tr>`;
+        });
+    }
+
+    // --- DASHBOARD ---
+    function updateDashboard() {
+        let patrimonio = 0, recorrente = 0;
+        DB.contratos.forEach(c => {
+            if(c.tipo !== 'VENDA') { patrimonio += c.custoTotal; recorrente += c.valorFinal; }
+        });
+        const lucroVendas = DB.faturas
+            .filter(f => f.status === 'PAGO' && f.descricao.includes('Venda'))
+            .reduce((total, fatura) => total + fatura.valor, 0);
+
+        document.getElementById('dashLucro').innerText = `R$ ${lucroVendas.toFixed(2)}`;
+        document.getElementById('dashPatrimonio').innerText = `R$ ${patrimonio.toFixed(2)}`;
+        document.getElementById('dashRecorrencia').innerText = `R$ ${recorrente.toFixed(2)}`;
+    }
+
+    // --- PDF ---
+    function gerarPDF(p) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const cli = DB.clientes.find(c => c.id === p.clienteId);
+
+        doc.setFillColor(44, 62, 80); doc.rect(0,0,210,40,'F');
+        doc.setTextColor(255,255,255); doc.setFontSize(20); doc.text("KELVIN EDUARDO", 14, 25);
+        doc.setFontSize(10); doc.text("CNPJ: 52.975.677/0001-49 | Jardinópolis-SP", 14, 32);
+
+        doc.setTextColor(0,0,0);
+        doc.text(`Cliente: ${cli.nome}`, 14, 50);
+        doc.text(`Tipo: ${p.tipo}`, 14, 56);
+        
+        const rows = p.itens.map(i => [i.nome, i.qtdCarrinho]);
+        doc.autoTable({ startY: 65, head: [['Item','Qtd']], body: rows });
+        
+        const finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(14);
+        const label = p.tipo === 'VENDA' ? 'TOTAL VENDA' : 'VALOR MENSAL';
+        doc.text(`${label}: R$ ${p.valorFinal.toFixed(2)}`, 14, finalY);
+
+        doc.save(`Pedido_${p.id}.pdf`);
+    }
+
+    function initSystem() { renderEstoque(); renderClientes(); updateDashboard(); }
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
