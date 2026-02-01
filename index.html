@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA KELVIN v1.0</title>
+    <title>SISTEMA KELVIN v1.1</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -74,7 +74,7 @@
     <div class="card card-techno p-5 text-center" style="width: 350px;">
         <h3 class="mb-4" style="color: var(--neon-cyan);"><i class="fas fa-shield-alt"></i> SISTEMA KELVIN</h3>
         <input type="password" id="loginPass" class="form-control mb-3 text-center" placeholder="Senha de Acesso">
-        <button onclick="fazerLogin()" class="btn btn-outline-info w-100">ENTRAR</button>
+        <button onclick="fazerLogin()" id="btnLogin" class="btn btn-outline-info w-100">ENTRAR</button>
         <small class="text-muted mt-3 d-block">Senha padrão: 1234</small>
     </div>
 </div>
@@ -92,7 +92,7 @@
             <button class="btn sidebar-btn" onclick="nav('clientes')"><i class="fas fa-users me-2"></i> Clientes</button>
             
             <div class="mt-auto text-center small text-muted">
-                v1.0 Techno<br>CNPJ: 52.975.677/0001-49
+                v1.1 Techno<br>CNPJ: 52.975.677/0001-49
             </div>
         </div>
 
@@ -256,4 +256,310 @@
     const DB = {
         clientes: JSON.parse(localStorage.getItem('db_clientes')) || [],
         produtos: JSON.parse(localStorage.getItem('db_produtos')) || [],
-        pedidos: JSON.parse(localStorage.getItem('db_pedidos'))
+        pedidos: JSON.parse(localStorage.getItem('db_pedidos')) || []
+    };
+
+    function saveDB() {
+        localStorage.setItem('db_clientes', JSON.stringify(DB.clientes));
+        localStorage.setItem('db_produtos', JSON.stringify(DB.produtos));
+        localStorage.setItem('db_pedidos', JSON.stringify(DB.pedidos));
+    }
+
+    // --- 2. LOGIN (ATUALIZADO COM TECLA ENTER) ---
+    function fazerLogin() {
+        const pass = document.getElementById('loginPass').value;
+        if(pass === '1234') {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-content').classList.remove('d-none');
+            initSystem();
+        } else {
+            alert('Senha incorreta! Tente 1234');
+        }
+    }
+
+    // Detectar Tecla ENTER no campo de senha
+    const inputLogin = document.getElementById("loginPass");
+    if(inputLogin) {
+        inputLogin.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                fazerLogin();
+            }
+        });
+    }
+
+    // --- 3. NAVEGAÇÃO ---
+    function nav(pageId) {
+        document.querySelectorAll('.page-section').forEach(el => el.classList.add('d-none'));
+        document.getElementById('page-' + pageId).classList.remove('d-none');
+        
+        document.querySelectorAll('.sidebar-btn').forEach(btn => btn.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+
+        if(pageId === 'dashboard') updateDashboard();
+        if(pageId === 'financeiro') renderFinanceiro('TODOS');
+    }
+
+    // --- 4. FUNÇÕES DE CADASTRO ---
+    function salvarProduto() {
+        const p = {
+            id: Date.now(),
+            nome: document.getElementById('prodNome').value,
+            custo: parseFloat(document.getElementById('prodCusto').value) || 0,
+            venda: parseFloat(document.getElementById('prodVenda').value) || 0,
+            qtd: parseInt(document.getElementById('prodQtd').value) || 0
+        };
+        DB.produtos.push(p);
+        saveDB();
+        renderEstoque();
+        alert('Produto Salvo!');
+        document.getElementById('prodNome').value = '';
+    }
+
+    function renderEstoque() {
+        const tbody = document.getElementById('tabelaEstoque');
+        const sel = document.getElementById('selProdOrc');
+        tbody.innerHTML = '';
+        sel.innerHTML = '<option value="">Selecione...</option>';
+
+        DB.produtos.forEach(p => {
+            const lucro = p.venda - p.custo;
+            const margem = p.venda > 0 ? ((lucro / p.venda) * 100).toFixed(0) : 0;
+            
+            // Tabela
+            tbody.innerHTML += `
+                <tr>
+                    <td>${p.nome}</td>
+                    <td>R$ ${p.custo.toFixed(2)}</td>
+                    <td>R$ ${p.venda.toFixed(2)}</td>
+                    <td class="${margem < 30 ? 'text-danger' : 'text-success'}">${margem}%</td>
+                    <td>${p.qtd}</td>
+                </tr>
+            `;
+
+            // Select Orçamento
+            sel.innerHTML += `<option value="${p.id}" data-venda="${p.venda}" data-custo="${p.custo}">${p.nome}</option>`;
+        });
+    }
+
+    function salvarCliente() {
+        const c = {
+            id: Date.now(),
+            nome: document.getElementById('cliNome').value,
+            doc: document.getElementById('cliDoc').value,
+            end: document.getElementById('cliEnd').value
+        };
+        DB.clientes.push(c);
+        saveDB();
+        renderClientes();
+    }
+
+    function renderClientes() {
+        const ul = document.getElementById('listaClientes');
+        const sel = document.getElementById('selCliente');
+        ul.innerHTML = '';
+        sel.innerHTML = '<option value="">Selecione...</option>';
+
+        DB.clientes.forEach(c => {
+            ul.innerHTML += `<li class="list-group-item bg-transparent text-white border-secondary">${c.nome} - ${c.doc}</li>`;
+            sel.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
+        });
+    }
+
+    // --- 5. ORÇAMENTO ---
+    let carrinho = [];
+
+    function toggleMensalidade() {
+        const tipo = document.getElementById('tipoContrato').value;
+        const div = document.getElementById('divMensalidade');
+        if(tipo === 'VENDA') div.classList.add('d-none');
+        else div.classList.remove('d-none');
+    }
+
+    function addCarrinho() {
+        const sel = document.getElementById('selProdOrc');
+        if(!sel.value) return;
+        
+        const id = parseInt(sel.value);
+        const prod = DB.produtos.find(p => p.id === id);
+        const qtd = parseInt(document.getElementById('qtdItem').value);
+
+        carrinho.push({ ...prod, qtdCarrinho: qtd });
+        renderCarrinho();
+    }
+
+    function renderCarrinho() {
+        const tbody = document.getElementById('tabelaCarrinho');
+        tbody.innerHTML = '';
+        let total = 0;
+
+        carrinho.forEach((item, idx) => {
+            const subtotal = item.venda * item.qtdCarrinho;
+            total += subtotal;
+            tbody.innerHTML += `<tr><td>${item.nome}</td><td>${item.qtdCarrinho}</td><td>R$ ${subtotal.toFixed(2)}</td><td><button onclick="carrinho.splice(${idx},1);renderCarrinho()" class="btn btn-sm btn-danger">X</button></td></tr>`;
+        });
+
+        // Se for Aluguel, o total exibido é o da mensalidade, não das peças
+        const tipo = document.getElementById('tipoContrato').value;
+        if(tipo !== 'VENDA') {
+            const mensal = parseFloat(document.getElementById('valorMensal').value) || 0;
+            document.getElementById('displayTotal').innerText = `Mensal: R$ ${mensal.toFixed(2)}`;
+            document.getElementById('displayTotal').classList.replace('text-info', 'text-warning');
+        } else {
+            document.getElementById('displayTotal').innerText = `Total: R$ ${total.toFixed(2)}`;
+            document.getElementById('displayTotal').classList.replace('text-warning', 'text-info');
+        }
+    }
+
+    function finalizarPedido() {
+        const cliId = document.getElementById('selCliente').value;
+        if(!cliId) return alert('Selecione o Cliente');
+
+        const tipo = document.getElementById('tipoContrato').value;
+        const mensal = parseFloat(document.getElementById('valorMensal').value) || 0;
+        
+        // Calcula Custo Total do Pedido (para saber lucro ou investimento)
+        const custoTotalItens = carrinho.reduce((acc, item) => acc + (item.custo * item.qtdCarrinho), 0);
+        const vendaTotalItens = carrinho.reduce((acc, item) => acc + (item.venda * item.qtdCarrinho), 0);
+
+        const pedido = {
+            id: Date.now(),
+            data: new Date().toISOString(),
+            clienteId: parseInt(cliId),
+            tipo: tipo,
+            itens: carrinho,
+            custoTotal: custoTotalItens, // Quanto você gastou nas peças
+            valorFinal: (tipo === 'VENDA') ? vendaTotalItens : mensal, // Quanto vai entrar
+            status: 'APROVADO'
+        };
+
+        DB.pedidos.push(pedido);
+        
+        // Baixa de Estoque
+        carrinho.forEach(itemC => {
+            const p = DB.produtos.find(prod => prod.id === itemC.id);
+            if(p) p.qtd -= itemC.qtdCarrinho;
+        });
+
+        saveDB();
+        alert('Pedido Salvo!');
+        carrinho = [];
+        renderCarrinho();
+        renderEstoque();
+        gerarPDF(pedido);
+    }
+
+    // --- 6. DASHBOARD INTELIGENTE ---
+    function updateDashboard() {
+        let lucroVendas = 0;
+        let patrimonioRua = 0;
+        let receitaMensal = 0;
+
+        DB.pedidos.forEach(p => {
+            if(p.tipo === 'VENDA') {
+                // Lucro = Valor Pago pelo Cliente - Custo das Peças
+                lucroVendas += (p.valorFinal - p.custoTotal);
+            } else {
+                // Aluguel/Streaming
+                // Custo das peças vira "Patrimônio Alugado"
+                patrimonioRua += p.custoTotal;
+                // Valor da mensalidade entra na receita recorrente
+                receitaMensal += p.valorFinal;
+            }
+        });
+
+        document.getElementById('dashLucro').innerText = `R$ ${lucroVendas.toFixed(2)}`;
+        document.getElementById('dashPatrimonio').innerText = `R$ ${patrimonioRua.toFixed(2)}`;
+        document.getElementById('dashRecorrencia').innerText = `R$ ${receitaMensal.toFixed(2)}`;
+        
+        // Render Chart
+        new Chart(document.getElementById('graficoLucro'), {
+            type: 'bar',
+            data: {
+                labels: ['Lucro Vendas', 'Patrimônio Ativo', 'Receita Mensal'],
+                datasets: [{
+                    label: 'Financeiro',
+                    data: [lucroVendas, patrimonioRua, receitaMensal],
+                    backgroundColor: ['#00ff9d', '#ff9100', '#00e5ff']
+                }]
+            },
+            options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#333' } } } }
+        });
+    }
+
+    // --- 7. FINANCEIRO & PDF ---
+    function renderFinanceiro(filtro) {
+        const tb = document.getElementById('tabelaFinanceiro');
+        tb.innerHTML = '';
+        
+        DB.pedidos.forEach(p => {
+            if(filtro !== 'TODOS' && p.tipo !== filtro) return;
+            const cli = DB.clientes.find(c => c.id === p.clienteId);
+            
+            tb.innerHTML += `
+                <tr>
+                    <td>${new Date(p.data).toLocaleDateString()}</td>
+                    <td>${cli ? cli.nome : 'Excluído'}</td>
+                    <td><span class="badge badge-${p.tipo === 'VENDA' ? 'cyan' : 'orange'}">${p.tipo}</span></td>
+                    <td>R$ ${p.valorFinal.toFixed(2)}</td>
+                    <td class="text-success">APROVADO</td>
+                </tr>
+            `;
+        });
+    }
+
+    function gerarPDF(pedido) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const cli = DB.clientes.find(c => c.id === pedido.clienteId);
+
+        // Header Dark
+        doc.setFillColor(30, 30, 30);
+        doc.rect(0, 0, 210, 40, 'F');
+        doc.setTextColor(0, 229, 255); // Cyan
+        doc.setFontSize(20);
+        doc.text("KELVIN EDUARDO", 14, 20);
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(10);
+        doc.text("Soluções em Segurança Eletrônica", 14, 26);
+        doc.text("CNPJ: 52.975.677/0001-49", 140, 20);
+        doc.text("Jardinópolis - SP", 140, 26);
+
+        // Body
+        doc.setTextColor(0,0,0);
+        doc.text(`CLIENTE: ${cli.nome}`, 14, 50);
+        doc.text(`TIPO CONTRATO: ${pedido.tipo}`, 14, 56);
+
+        const rows = pedido.itens.map(i => [i.nome, i.qtdCarrinho, `R$ ${i.venda}`]);
+        doc.autoTable({
+            startY: 65,
+            head: [['Item', 'Qtd', 'Unit']],
+            body: rows,
+            theme: 'grid'
+        });
+
+        const finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(14);
+        if(pedido.tipo === 'VENDA') {
+            doc.text(`TOTAL A PAGAR: R$ ${pedido.valorFinal.toFixed(2)}`, 14, finalY);
+        } else {
+            doc.setTextColor(200, 0, 0);
+            doc.text(`MENSALIDADE: R$ ${pedido.valorFinal.toFixed(2)}`, 14, finalY);
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.text("Equipamentos em regime de comodato (propriedade da empresa).", 14, finalY + 8);
+        }
+
+        doc.save(`Pedido_${pedido.id}.pdf`);
+    }
+
+    // Inicialização
+    function initSystem() {
+        renderEstoque();
+        renderClientes();
+        updateDashboard();
+    }
+</script>
+
+</body>
+</html>
