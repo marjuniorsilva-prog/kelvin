@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SISTEMA KELVIN v2.0</title>
+    <title>SISTEMA KELVIN v1.0 Oficial</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -52,6 +52,9 @@
             50% { opacity: 0.7; }
             100% { opacity: 1; }
         }
+        
+        /* LABELS FORMULÁRIO */
+        .form-label-custom { font-size: 0.85rem; font-weight: 700; color: #555; margin-bottom: 2px; }
     </style>
 </head>
 <body>
@@ -73,11 +76,11 @@
         <div class="col-md-2 p-3 d-none d-md-block" style="background-color: var(--bg-sidebar);">
             <h5 class="text-center mb-4 text-white mt-2" style="letter-spacing: 2px;">KELVIN<span style="color:var(--brand-color)">SYS</span></h5>
             <button class="btn sidebar-btn active" onclick="nav('dashboard')"><i class="fas fa-chart-line me-2"></i> Dashboard</button>
+            <button class="btn sidebar-btn" onclick="nav('clientes')"><i class="fas fa-users me-2"></i> Clientes</button>
             <button class="btn sidebar-btn" onclick="nav('orcamento')"><i class="fas fa-file-contract me-2"></i> Orçamentos</button>
             <button class="btn sidebar-btn" onclick="nav('contratos')"><i class="fas fa-handshake me-2"></i> Contratos Ativos</button>
             <button class="btn sidebar-btn" onclick="nav('financeiro')"><i class="fas fa-wallet me-2"></i> Financeiro</button>
             <button class="btn sidebar-btn" onclick="nav('estoque')"><i class="fas fa-box-open me-2"></i> Estoque</button>
-            <button class="btn sidebar-btn" onclick="nav('clientes')"><i class="fas fa-users me-2"></i> Clientes</button>
         </div>
 
         <div class="col-12 d-md-none bg-dark p-2 d-flex justify-content-between align-items-center text-white">
@@ -86,11 +89,11 @@
         </div>
         <div class="collapse w-100 d-md-none bg-dark" id="menuMobile">
             <button class="btn sidebar-btn" onclick="nav('dashboard')">Dashboard</button>
+            <button class="btn sidebar-btn" onclick="nav('clientes')">Clientes</button>
             <button class="btn sidebar-btn" onclick="nav('financeiro')">Financeiro</button>
             <button class="btn sidebar-btn" onclick="nav('orcamento')">Orçamentos</button>
             <button class="btn sidebar-btn" onclick="nav('contratos')">Contratos Ativos</button>
             <button class="btn sidebar-btn" onclick="nav('estoque')">Estoque</button>
-            <button class="btn sidebar-btn" onclick="nav('clientes')">Clientes</button>
         </div>
 
         <div class="col-md-10 p-4">
@@ -119,19 +122,77 @@
                 </div>
             </div>
 
+            <div id="page-clientes" class="page-section d-none">
+                <div class="card card-custom p-4 mb-3">
+                    <h5 class="mb-3 text-primary"><i class="fas fa-user-plus"></i> Novo Cliente</h5>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Nome / Razão Social</label>
+                            <input type="text" id="cliNome" class="form-control" placeholder="Ex: João da Silva">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label-custom">CPF / CNPJ</label>
+                            <input type="text" id="cliDoc" class="form-control" placeholder="Apenas números">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label-custom">Telefone</label>
+                            <input type="text" id="cliTel" class="form-control" placeholder="(00) 00000-0000">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label-custom">CEP (Busca Auto)</label>
+                            <input type="text" id="cliCep" class="form-control" placeholder="00000-000" onblur="buscarCep()">
+                        </div>
+                        <div class="col-md-7">
+                            <label class="form-label-custom">Rua / Logradouro</label>
+                            <input type="text" id="cliRua" class="form-control" readonly style="background-color: #f8f9fa;">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label-custom">Número</label>
+                            <input type="text" id="cliNum" class="form-control">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label-custom">Bairro</label>
+                            <input type="text" id="cliBairro" class="form-control" readonly style="background-color: #f8f9fa;">
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label-custom">Cidade</label>
+                            <input type="text" id="cliCidade" class="form-control" readonly style="background-color: #f8f9fa;">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label-custom">Estado</label>
+                            <input type="text" id="cliUf" class="form-control" readonly style="background-color: #f8f9fa;">
+                        </div>
+
+                        <div class="col-12 text-end mt-4">
+                            <button onclick="salvarCliente()" class="btn btn-primary fw-bold px-5">SALVAR CLIENTE</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-custom table-responsive">
+                    <h6 class="p-3 border-bottom mb-0 fw-bold">Lista de Clientes</h6>
+                    <table class="table table-hover m-0">
+                        <thead class="table-light"><tr><th>Nome</th><th>Telefone</th><th>Endereço</th></tr></thead>
+                        <tbody id="listaClientes"></tbody>
+                    </table>
+                </div>
+            </div>
+
             <div id="page-financeiro" class="page-section d-none">
                 <div class="d-flex flex-wrap justify-content-between align-items-end mb-4 bg-white p-3 rounded shadow-sm">
                     <div>
                         <h4 class="mb-2">Controle Financeiro</h4>
-                        <label class="small text-muted fw-bold">SELECIONE O MÊS DE REFERÊNCIA:</label>
+                        <label class="small text-muted fw-bold">MÊS DE REFERÊNCIA:</label>
                         <div class="d-flex gap-2">
                             <input type="month" id="filtroMes" class="form-control" style="width: 200px;" onchange="renderFinanceiro()">
                             <button onclick="gerarFaturasDoMesSelecionado()" class="btn btn-primary fw-bold">
-                                <i class="fas fa-sync"></i> GERAR COBRANÇAS
+                                <i class="fas fa-sync"></i> GERAR
                             </button>
                         </div>
                     </div>
-                    
                     <div class="mt-3 mt-md-0">
                         <div class="btn-group shadow-sm">
                             <button class="btn btn-outline-secondary active" onclick="filtrarStatus('TODOS', this)">Todos</button>
@@ -144,15 +205,7 @@
                 <div class="card card-custom table-responsive">
                     <table class="table table-hover m-0">
                         <thead class="table-light">
-                            <tr>
-                                <th>Vencimento</th>
-                                <th>Cliente</th>
-                                <th>Tipo</th>
-                                <th>Ref</th>
-                                <th>Valor</th>
-                                <th>Status</th>
-                                <th>Ação</th>
-                            </tr>
+                            <tr><th>Vencimento</th><th>Cliente</th><th>Tipo</th><th>Ref</th><th>Valor</th><th>Status</th><th>Ação</th></tr>
                         </thead>
                         <tbody id="listaFaturas"></tbody>
                     </table>
@@ -218,185 +271,176 @@
                 <div class="card card-custom table-responsive"><table class="table table-hover m-0"><tbody id="tabelaEstoque"></tbody></table></div>
             </div>
 
-            <div id="page-clientes" class="page-section d-none">
-                <div class="card card-custom p-3 mb-3">
-                    <div class="row g-2">
-                        <div class="col-md-2"><input type="text" id="cliCep" class="form-control" placeholder="CEP" onblur="buscarCep()"></div>
-                        <div class="col-md-4"><input type="text" id="cliRua" class="form-control" placeholder="Rua" readonly></div>
-                        <div class="col-md-2"><input type="text" id="cliNum" class="form-control" placeholder="Nº"></div>
-                        <div class="col-md-4"><input type="text" id="cliNome" class="form-control" placeholder="Nome"></div>
-                        <div class="col-md-12 text-end"><button onclick="salvarCliente()" class="btn btn-primary">Salvar</button></div>
-                    </div>
-                </div>
-                <div class="card card-custom table-responsive"><table class="table table-hover m-0"><tbody id="listaClientes"></tbody></table></div>
-            </div>
-
         </div>
     </div>
 </div>
 
 <script>
+    // --- BANCO DE DADOS (BASE) ---
     const DB = {
-        clientes: JSON.parse(localStorage.getItem('k20_clientes')) || [],
-        produtos: JSON.parse(localStorage.getItem('k20_produtos')) || [],
-        orcamentos: JSON.parse(localStorage.getItem('k20_orcamentos')) || [],
-        contratos: JSON.parse(localStorage.getItem('k20_contratos')) || [],
-        faturas: JSON.parse(localStorage.getItem('k20_faturas')) || []
+        clientes: JSON.parse(localStorage.getItem('k10_clientes')) || [],
+        produtos: JSON.parse(localStorage.getItem('k10_produtos')) || [],
+        orcamentos: JSON.parse(localStorage.getItem('k10_orcamentos')) || [],
+        contratos: JSON.parse(localStorage.getItem('k10_contratos')) || [],
+        faturas: JSON.parse(localStorage.getItem('k10_faturas')) || []
     };
     function saveDB() {
-        localStorage.setItem('k20_clientes', JSON.stringify(DB.clientes));
-        localStorage.setItem('k20_produtos', JSON.stringify(DB.produtos));
-        localStorage.setItem('k20_orcamentos', JSON.stringify(DB.orcamentos));
-        localStorage.setItem('k20_contratos', JSON.stringify(DB.contratos));
-        localStorage.setItem('k20_faturas', JSON.stringify(DB.faturas));
+        localStorage.setItem('k10_clientes', JSON.stringify(DB.clientes));
+        localStorage.setItem('k10_produtos', JSON.stringify(DB.produtos));
+        localStorage.setItem('k10_orcamentos', JSON.stringify(DB.orcamentos));
+        localStorage.setItem('k10_contratos', JSON.stringify(DB.contratos));
+        localStorage.setItem('k10_faturas', JSON.stringify(DB.faturas));
     }
 
     function fazerLogin() { if(document.getElementById('loginPass').value==='1234'){ document.getElementById('login-screen').style.display='none'; document.getElementById('app-content').classList.remove('d-none'); initSystem(); } else alert('Senha errada'); }
     
-    // --- NAVEGAÇÃO CORRIGIDA ---
+    // --- NAVEGAÇÃO ---
     function nav(p) { 
         document.querySelectorAll('.page-section').forEach(el=>el.classList.add('d-none')); 
         document.getElementById('page-'+p).classList.remove('d-none'); 
-        
-        // Fecha menu mobile
         const menu = document.getElementById('menuMobile');
         if(menu.classList.contains('show')) new bootstrap.Collapse(menu).hide();
-
         if(p==='dashboard') updateDashboard(); 
         if(p==='financeiro') renderFinanceiro(); 
         if(p==='contratos') renderContratosAtivos();
+        if(p==='clientes') renderClientes();
     }
 
-    // --- DATAS E FILTROS ---
-    function getMesAtualInput() {
-        const h = new Date();
-        return `${h.getFullYear()}-${String(h.getMonth()+1).padStart(2,'0')}`;
+    function getMesAtualInput() { const h = new Date(); return `${h.getFullYear()}-${String(h.getMonth()+1).padStart(2,'0')}`; }
+
+    // --- CLIENTES (COM CEP) ---
+    async function buscarCep() {
+        let cep = document.getElementById('cliCep').value.replace(/\D/g,'');
+        if(cep.length===8){
+            try{
+                document.getElementById('cliRua').value = "Buscando...";
+                let r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                let d = await r.json();
+                if(!d.erro){
+                    document.getElementById('cliRua').value = d.logradouro;
+                    document.getElementById('cliBairro').value = d.bairro;
+                    document.getElementById('cliCidade').value = d.localidade;
+                    document.getElementById('cliUf').value = d.uf;
+                    document.getElementById('cliNum').focus();
+                } else {
+                    alert('CEP não encontrado!');
+                    document.getElementById('cliRua').value = "";
+                }
+            }catch(e){ alert('Erro ao buscar CEP'); }
+        }
     }
 
-    // --- FINANCEIRO AVANÇADO ---
+    function salvarCliente() {
+        const nome = document.getElementById('cliNome').value;
+        if(!nome) return alert("Preencha o Nome!");
+
+        DB.clientes.push({
+            id: Date.now(),
+            nome: nome,
+            doc: document.getElementById('cliDoc').value,
+            tel: document.getElementById('cliTel').value,
+            cep: document.getElementById('cliCep').value,
+            rua: document.getElementById('cliRua').value,
+            num: document.getElementById('cliNum').value,
+            bairro: document.getElementById('cliBairro').value,
+            cidade: document.getElementById('cliCidade').value,
+            uf: document.getElementById('cliUf').value
+        });
+        saveDB(); renderClientes(); alert('Cliente Salvo!');
+        // Limpar
+        document.getElementById('cliNome').value = '';
+        document.getElementById('cliDoc').value = '';
+        document.getElementById('cliTel').value = '';
+        document.getElementById('cliCep').value = '';
+        document.getElementById('cliRua').value = '';
+        document.getElementById('cliNum').value = '';
+        document.getElementById('cliBairro').value = '';
+        document.getElementById('cliCidade').value = '';
+        document.getElementById('cliUf').value = '';
+    }
+
+    function renderClientes() {
+        const tb = document.getElementById('listaClientes'); 
+        const sel = document.getElementById('selCliente'); 
+        tb.innerHTML=''; sel.innerHTML='<option value="">Selecione...</option>';
+        
+        DB.clientes.forEach(c => {
+            const endCompleto = `${c.rua}, ${c.num} - ${c.bairro}, ${c.cidade}/${c.uf}`;
+            tb.innerHTML += `<tr><td>${c.nome}</td><td>${c.tel}</td><td><small>${endCompleto}</small></td></tr>`;
+            sel.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
+        });
+    }
+
+    // --- FINANCEIRO ---
     let statusFiltro = 'TODOS';
-
     function filtrarStatus(st, btn) {
         statusFiltro = st;
         btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         renderFinanceiro();
     }
-
     function gerarFaturasDoMesSelecionado() {
         const inputMes = document.getElementById('filtroMes').value; 
-        if(!inputMes) return alert("Selecione um mês no calendário!");
-
+        if(!inputMes) return alert("Selecione um mês!");
         const [ano, mes] = inputMes.split('-');
         const refVisual = `${mes}/${ano}`;
         let count = 0;
-
         DB.contratos.forEach(c => {
             if(c.status !== 'ATIVO') return;
-
             const chaveUnica = `${c.id}-${inputMes}`;
-            const jaExiste = DB.faturas.find(f => f.chaveUnica === chaveUnica);
-
-            if(!jaExiste) {
+            if(!DB.faturas.find(f => f.chaveUnica === chaveUnica)) {
                 const diaVenc = c.diaVencimento || 10;
                 const dataVencimentoIso = `${ano}-${mes}-${String(diaVenc).padStart(2,'0')}`;
-
                 DB.faturas.push({
-                    id: Date.now() + Math.random(),
-                    chaveUnica: chaveUnica,
+                    id: Date.now() + Math.random(), chaveUnica: chaveUnica,
                     contratoId: c.id, clienteNome: c.clienteNome,
                     descricao: `Mensalidade ${c.tipo}`, valor: c.valorFinal,
-                    vencimentoIso: dataVencimentoIso,
-                    ref: refVisual, status: 'ABERTO', tipo: c.tipo
+                    vencimentoIso: dataVencimentoIso, ref: refVisual, status: 'ABERTO', tipo: c.tipo
                 });
                 count++;
             }
         });
-        saveDB(); renderFinanceiro();
-        if(count > 0) alert(`${count} cobranças geradas para ${refVisual}!`);
-        else alert(`Todas cobranças de ${refVisual} já foram geradas.`);
+        saveDB(); renderFinanceiro(); alert(`${count} cobranças geradas!`);
     }
-
     function renderFinanceiro() {
         const tb = document.getElementById('listaFaturas'); tb.innerHTML = '';
         const inputMes = document.getElementById('filtroMes').value; 
-        
         DB.faturas.sort((a,b) => a.vencimentoIso.localeCompare(b.vencimentoIso));
-
         DB.faturas.forEach(f => {
             if(inputMes && !f.vencimentoIso.startsWith(inputMes)) return;
-
             let statusReal = f.status;
             const hojeIso = new Date().toISOString().split('T')[0];
-            
             if(f.status === 'ABERTO' && f.vencimentoIso < hojeIso) statusReal = 'VENCIDO';
             if(statusFiltro !== 'TODOS' && statusReal !== statusFiltro) {
                 if(statusFiltro === 'VENCIDO' && statusReal !== 'VENCIDO') return;
                 if(statusFiltro === 'PAGO' && statusReal !== 'PAGO') return;
             }
-
-            let badgeClass = 'badge-aberto';
-            if(statusReal === 'PAGO') badgeClass = 'badge-pago';
-            if(statusReal === 'VENCIDO') badgeClass = 'badge-vencido';
-
+            let badgeClass = statusReal === 'PAGO' ? 'badge-pago' : (statusReal === 'VENCIDO' ? 'badge-vencido' : 'badge-aberto');
             const [ano, mes, dia] = f.vencimentoIso.split('-');
-            const dataPtBr = `${dia}/${mes}/${ano}`;
-
-            const btn = f.status === 'ABERTO' 
-                ? `<button onclick="darBaixa(${f.id})" class="btn btn-sm btn-outline-success fw-bold">RECEBER</button>` 
-                : `<span class="text-success"><i class="fas fa-check-circle"></i></span>`;
-
-            tb.innerHTML += `
-                <tr>
-                    <td>${dataPtBr}</td>
-                    <td>${f.clienteNome}</td>
-                    <td><span class="badge bg-secondary">${f.tipo}</span></td>
-                    <td>${f.ref}</td>
-                    <td>R$ ${f.valor.toFixed(2)}</td>
-                    <td><span class="badge ${badgeClass}">${statusReal}</span></td>
-                    <td>${btn}</td>
-                </tr>
-            `;
+            const btn = f.status === 'ABERTO' ? `<button onclick="darBaixa(${f.id})" class="btn btn-sm btn-outline-success fw-bold">RECEBER</button>` : `<span class="text-success"><i class="fas fa-check-circle"></i></span>`;
+            tb.innerHTML += `<tr><td>${dia}/${mes}/${ano}</td><td>${f.clienteNome}</td><td><span class="badge bg-secondary">${f.tipo}</span></td><td>${f.ref}</td><td>R$ ${f.valor.toFixed(2)}</td><td><span class="badge ${badgeClass}">${statusReal}</span></td><td>${btn}</td></tr>`;
         });
     }
+    function darBaixa(id) { const f=DB.faturas.find(x=>x.id==id); if(f){f.status='PAGO'; saveDB(); renderFinanceiro(); updateDashboard();} }
 
-    function darBaixa(id) {
-        const f = DB.faturas.find(x => x.id == id);
-        if(f) { 
-            f.status = 'PAGO'; 
-            f.dataPagamento = new Date().toLocaleDateString();
-            saveDB(); renderFinanceiro(); updateDashboard();
-        }
-    }
-
+    // --- DASHBOARD ---
     function updateDashboard() {
         const hojeIso = new Date().toISOString().split('T')[0];
-        let recebido = 0, vencido = 0, futuro = 0;
-
-        DB.faturas.forEach(f => {
-            if(f.status === 'PAGO') recebido += f.valor;
-            else if (f.status === 'ABERTO') {
-                if(f.vencimentoIso < hojeIso) vencido += f.valor;
-                else futuro += f.valor;
-            }
+        let r=0, v=0, f=0;
+        DB.faturas.forEach(x => {
+            if(x.status==='PAGO') r+=x.valor;
+            else if(x.vencimentoIso < hojeIso) v+=x.valor;
+            else f+=x.valor;
         });
-
-        document.getElementById('dashLucro').innerText = `R$ ${recebido.toFixed(2)}`;
-        document.getElementById('dashVencido').innerText = `R$ ${vencido.toFixed(2)}`;
-        document.getElementById('dashFuturo').innerText = `R$ ${futuro.toFixed(2)}`;
+        document.getElementById('dashLucro').innerText = `R$ ${r.toFixed(2)}`;
+        document.getElementById('dashVencido').innerText = `R$ ${v.toFixed(2)}`;
+        document.getElementById('dashFuturo').innerText = `R$ ${f.toFixed(2)}`;
     }
 
-    function initSystem() { 
-        document.getElementById('filtroMes').value = getMesAtualInput(); 
-        renderEstoque(); renderClientes(); updateDashboard(); 
-    }
-    
-    // --- ESTOQUE E CLIENTES ---
+    // --- ESTOQUE E PRODUTOS ---
     function salvarProduto() { DB.produtos.push({id:Date.now(), tipo:document.getElementById('prodTipo').value, nome:document.getElementById('prodNome').value, custo:parseFloat(document.getElementById('prodCusto').value)||0, venda:parseFloat(document.getElementById('prodVenda').value)||0, qtd:parseInt(document.getElementById('prodQtd').value)||0}); saveDB(); renderEstoque(); document.getElementById('prodNome').value=''; }
     function renderEstoque() { const tb=document.getElementById('tabelaEstoque'); const sel=document.getElementById('selProdOrc'); tb.innerHTML=''; sel.innerHTML='<option value="">Selecione</option>'; DB.produtos.forEach(p=>{ tb.innerHTML+=`<tr><td>${p.nome}</td><td>${p.tipo}</td><td>${p.custo}</td><td>${p.venda}</td><td>${p.tipo==='SERVICO'?'∞':p.qtd}</td><td>-</td></tr>`; sel.innerHTML+=`<option value="${p.id}" data-preco="${p.venda}">${p.nome}</option>`; }); }
-    function salvarCliente() { DB.clientes.push({id:Date.now(), nome:document.getElementById('cliNome').value, doc:'', tel:'', end: `${document.getElementById('cliRua').value}, ${document.getElementById('cliNum').value}`}); saveDB(); renderClientes(); }
-    function renderClientes() { const tb=document.getElementById('listaClientes'); const sel=document.getElementById('selCliente'); tb.innerHTML=''; sel.innerHTML='<option value="">Selecione</option>'; DB.clientes.forEach(c=>{ tb.innerHTML+=`<tr><td>${c.nome}</td><td>-</td><td>-</td></tr>`; sel.innerHTML+=`<option value="${c.id}">${c.nome}</option>`; }); }
-    function toggleEstoqueInput() { const t=document.getElementById('prodTipo').value; document.getElementById('prodQtd').disabled = (t==='SERVICO'); }
+    function toggleEstoqueInput() { document.getElementById('prodQtd').disabled = (document.getElementById('prodTipo').value==='SERVICO'); }
 
     // --- ORÇAMENTO ---
     let carrinho=[];
@@ -412,8 +456,10 @@
         const dia=parseInt(document.getElementById('diaVencimento').value)||10;
         const val=tipo==='VENDA'?0:parseFloat(document.getElementById('valorMensal').value);
         
-        DB.orcamentos.push({id:Date.now(), data:new Date().toISOString(), clienteId:cid, clienteNome:cli.nome, tipo:tipo, itens:carrinho, valorFinal:val, diaVencimento:dia, status:'PENDENTE'});
+        const orc = {id:Date.now(), data:new Date().toISOString(), clienteId:cid, clienteNome:cli.nome, tipo:tipo, itens:carrinho, valorFinal:val, diaVencimento:dia, status:'PENDENTE'};
+        DB.orcamentos.push(orc);
         saveDB(); renderHistoricoOrcamentos(); carrinho=[]; alert('Salvo Pendente');
+        gerarPDF(orc);
     }
     function renderHistoricoOrcamentos(){
         const tb=document.getElementById('listaOrcamentos'); tb.innerHTML='';
@@ -431,13 +477,7 @@
             } else {
                 DB.contratos.push({...o, status:'ATIVO', inicio:new Date().toLocaleDateString()});
             }
-            // Baixa Estoque
-            o.itens.forEach(i => {
-                if(i.tipo === 'PRODUTO') {
-                    const p = DB.produtos.find(x => x.id === i.id);
-                    if(p) p.qtd -= i.qtdCarrinho;
-                }
-            });
+            o.itens.forEach(i => { if(i.tipo === 'PRODUTO') { const p = DB.produtos.find(x => x.id === i.id); if(p) p.qtd -= i.qtdCarrinho; } });
             saveDB(); renderHistoricoOrcamentos(); renderContratosAtivos(); renderEstoque(); alert('Aprovado');
         }
     }
@@ -446,25 +486,35 @@
         DB.contratos.forEach(c=>{ if(c.status==='ATIVO') tb.innerHTML+=`<tr><td>${c.clienteNome}</td><td>${c.tipo}</td><td>Dia ${c.diaVencimento}</td><td>R$ ${c.valorFinal}</td><td>${c.inicio}</td><td><button onclick="encerrarContrato(${c.id})" class="btn btn-sm btn-outline-danger">Encerrar</button></td></tr>`; });
     }
     function encerrarContrato(id) {
-        const c = DB.contratos.find(cnt => cnt.id === id);
-        if(!c) return;
-        if(confirm("Devolver itens ao estoque?")) {
-            c.itens.forEach(item => { if(item.tipo === 'PRODUTO') { const p = DB.produtos.find(prod => prod.id === item.id); if(p) p.qtd += item.qtdCarrinho; } });
-        }
+        const c = DB.contratos.find(cnt => cnt.id === id); if(!c) return;
+        if(confirm("Devolver itens ao estoque?")) { c.itens.forEach(item => { if(item.tipo === 'PRODUTO') { const p = DB.produtos.find(prod => prod.id === item.id); if(p) p.qtd += item.qtdCarrinho; } }); }
         c.status = 'CANCELADO'; saveDB(); renderContratosAtivos(); renderEstoque();
     }
-    async function buscarCep() {
-        let cep = document.getElementById('cliCep').value.replace(/\D/g,'');
-        if(cep.length===8){
-            try{
-                let r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-                let d = await r.json();
-                if(!d.erro){
-                    document.getElementById('cliRua').value = d.logradouro;
-                    document.getElementById('cliNum').focus();
-                }
-            }catch(e){}
-        }
+
+    // --- PDF ---
+    function gerarPDF(p){
+        const {jsPDF}=window.jspdf; const doc=new jsPDF();
+        doc.setFillColor(26,26,26); doc.rect(0,0,210,40,'F');
+        doc.setTextColor(0,210,255); doc.setFontSize(22); doc.text("KELVIN EDUARDO",14,25);
+        doc.setTextColor(255,255,255); doc.setFontSize(10); doc.text("CNPJ: 52.975.677/0001-49",14,32);
+        
+        doc.setTextColor(0,0,0);
+        let tit="ORÇAMENTO"; if(p.tipo==='ALUGUEL') tit="LOCAÇÃO"; if(p.tipo==='STREAMING') tit="STREAMING";
+        doc.setFontSize(16); doc.text(tit,105,55,null,null,'center');
+        
+        doc.setFontSize(10); doc.text(`CLIENTE: ${p.clienteNome}`,14,65);
+        const rows=p.itens.map(i=>[i.nome,i.qtdCarrinho,`R$ ${i.venda}`]);
+        doc.autoTable({startY:75, head:[['Item','Qtd','Preço']], body:rows});
+        
+        const y=doc.lastAutoTable.finalY+10; doc.setFontSize(14);
+        if(p.tipo==='VENDA') doc.text(`TOTAL: R$ ${p.valorFinal.toFixed(2)}`,14,y);
+        else { doc.setTextColor(200,0,0); doc.text(`MENSALIDADE: R$ ${p.valorFinal.toFixed(2)}`,14,y); }
+        doc.save(`Kelvin_${p.id}.pdf`);
+    }
+
+    function initSystem() { 
+        document.getElementById('filtroMes').value = getMesAtualInput(); 
+        renderEstoque(); renderClientes(); updateDashboard(); 
     }
 </script>
 
