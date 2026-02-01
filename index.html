@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SISTEMA KELVIN v2.1 PRO</title>
+    <title>SISTEMA KELVIN v2.2 PRO</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -15,28 +15,29 @@
             --bg-body: #f4f7f9;
             --sidebar-color: #1a1a27;
             --brand-cyan: #00d2ff;
-            --accent-green: #27ae60;
         }
 
         body { background-color: var(--bg-body); font-family: 'Inter', sans-serif; }
         
-        /* SIDEBAR */
+        /* SIDEBAR DESKTOP */
         .sidebar { background-color: var(--sidebar-color); min-height: 100vh; padding: 0; box-shadow: 4px 0 10px rgba(0,0,0,0.1); }
-        .sidebar-btn { width: 100%; border: none; background: transparent; color: #a2a3b7; padding: 15px 25px; text-align: left; transition: 0.3s; display: flex; align-items: center; }
+        .sidebar-btn { width: 100%; border: none; background: transparent; color: #a2a3b7; padding: 15px 25px; text-align: left; transition: 0.3s; display: flex; align-items: center; text-decoration: none; }
         .sidebar-btn i { width: 25px; margin-right: 10px; }
         .sidebar-btn:hover, .sidebar-btn.active { color: #fff; background: rgba(255,255,255,0.05); }
         .sidebar-btn.active { color: var(--brand-cyan); border-right: 4px solid var(--brand-cyan); font-weight: 600; }
 
-        /* CARDS & TABLES */
-        .card { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: 0.3s; }
-        .card:hover { transform: translateY(-2px); }
-        .table thead { background: #f8f9fa; }
-        .table th { font-size: 0.75rem; text-transform: uppercase; color: #5e6278; letter-spacing: 0.5px; }
+        /* MENU MOBILE CORRIGIDO */
+        .mobile-header { display: none; background: var(--sidebar-color); padding: 15px; color: white; position: sticky; top: 0; z-index: 1050; }
+        
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .mobile-header { display: flex; justify-content: space-between; align-items: center; }
+            .navbar-collapse { background: var(--sidebar-color); position: absolute; top: 56px; left: 0; width: 100%; z-index: 1040; border-bottom: 2px solid var(--brand-cyan); }
+            .sidebar-btn { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        }
 
-        /* NOTIFICAÇÃO (TOAST) */
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         #toast-container { position: fixed; top: 20px; right: 20px; z-index: 10000; }
-
-        /* LOGIN */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--sidebar-color); z-index: 9999; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
@@ -52,13 +53,31 @@
     </div>
 </div>
 
+<div class="mobile-header d-md-none" id="mobile-top-bar" style="display:none;">
+    <span class="fw-bold">KELVIN <span style="color:var(--brand-cyan)">SYS</span></span>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#menuMobile">
+        <i class="fas fa-bars fa-lg text-white"></i>
+    </button>
+</div>
+
+<div class="collapse d-md-none" id="menuMobile">
+    <div class="nav-menu">
+        <button class="sidebar-btn active" onclick="nav('dashboard', this)"><i class="fas fa-chart-line"></i> Dashboard</button>
+        <button class="sidebar-btn" onclick="nav('orcamento', this)"><i class="fas fa-file-invoice"></i> Orçamentos</button>
+        <button class="sidebar-btn" onclick="nav('contratos', this)"><i class="fas fa-handshake"></i> Contratos</button>
+        <button class="sidebar-btn" onclick="nav('clientes', this)"><i class="fas fa-users"></i> Clientes</button>
+        <button class="sidebar-btn" onclick="nav('estoque', this)"><i class="fas fa-boxes"></i> Estoque</button>
+        <button class="sidebar-btn" onclick="nav('financeiro', this)"><i class="fas fa-wallet"></i> Financeiro</button>
+    </div>
+</div>
+
 <div id="app-content" class="container-fluid d-none">
     <div class="row">
         
         <div class="col-md-2 sidebar sticky-top d-none d-md-block">
             <div class="p-4 text-center border-bottom border-secondary mb-3">
                 <h5 class="text-white fw-bold mb-0">KELVIN <span style="color:var(--brand-cyan)">SYS</span></h5>
-                <small class="text-muted">v2.1 Business</small>
+                <small class="text-muted">v2.2 Business</small>
             </div>
             <button class="sidebar-btn active" onclick="nav('dashboard', this)"><i class="fas fa-chart-line"></i> Dashboard</button>
             <button class="sidebar-btn" onclick="nav('orcamento', this)"><i class="fas fa-file-invoice"></i> Orçamentos</button>
@@ -73,10 +92,10 @@
             <div id="page-dashboard" class="page-section">
                 <h4 class="fw-bold mb-4 text-dark">Painel de Resultados</h4>
                 <div class="row g-4 mb-4">
-                    <div class="col-md-3"><div class="card p-4"><span class="text-muted small fw-bold">BRUTO RECEBIDO</span><h3 class="text-success fw-bold" id="dashBruto">R$ 0,00</h3></div></div>
-                    <div class="col-md-3"><div class="card p-4"><span class="text-muted small fw-bold">LUCRO LÍQUIDO</span><h3 class="text-info fw-bold" id="dashLucro">R$ 0,00</h3><small class="text-muted">Descontando custos</small></div></div>
-                    <div class="col-md-3"><div class="card p-4"><span class="text-muted small fw-bold">INADIMPLÊNCIA</span><h3 class="text-danger fw-bold" id="dashVencido">R$ 0,00</h3></div></div>
-                    <div class="col-md-3"><div class="card p-4"><span class="text-muted small fw-bold">PROJEÇÃO FUTURA</span><h3 class="text-primary fw-bold" id="dashFuturo">R$ 0,00</h3></div></div>
+                    <div class="col-md-3"><div class="card p-4"><span>BRUTO</span><h3 class="text-success fw-bold" id="dashBruto">R$ 0,00</h3></div></div>
+                    <div class="col-md-3"><div class="card p-4"><span>LUCRO REAL</span><h3 class="text-info fw-bold" id="dashLucro">R$ 0,00</h3></div></div>
+                    <div class="col-md-3"><div class="card p-4"><span>VENCIDO</span><h3 class="text-danger fw-bold" id="dashVencidoc">R$ 0,00</h3></div></div>
+                    <div class="col-md-3"><div class="card p-4"><span>FUTURO</span><h3 class="text-primary fw-bold" id="dashFuturo">R$ 0,00</h3></div></div>
                 </div>
             </div>
 
@@ -117,59 +136,54 @@
                 </div>
                 <div class="card p-3">
                     <input type="text" class="form-control mb-3" placeholder="Filtrar estoque..." onkeyup="filtrarTabela('tabelaEstoque', this.value)">
-                    <table class="table table-pro"><thead class="table-light"><tr><th>Item</th><th>Custo</th><th>Venda</th><th>Margem</th><th>Qtd</th><th>Ação</th></tr></thead><tbody id="tabelaEstoque"></tbody></table>
-                </div>
-            </div>
-
-            <div id="page-orcamento" class="page-section d-none">
-                <ul class="nav nav-pills mb-4">
-                    <li class="nav-item"><button class="nav-link active me-2" data-bs-toggle="pill" data-bs-target="#tab-novo-orc">Novo Orçamento</button></li>
-                    <li class="nav-item"><button class="nav-link bg-white" data-bs-toggle="pill" data-bs-target="#tab-hist-orc" onclick="renderHistoricoOrcamentos()">Pendentes</button></li>
-                </ul>
-                <div class="tab-content">
-                    <div class="tab-pane fade show active" id="tab-novo-orc">
-                        <div class="row g-4">
-                            <div class="col-md-4">
-                                <div class="card p-4 shadow-sm border-top border-5 border-primary">
-                                    <label class="small fw-bold mb-1">Cliente</label><select id="selCliente" class="form-select mb-3"></select>
-                                    <label class="small fw-bold mb-1">Tipo</label><select id="tipoContrato" class="form-select mb-3" onchange="toggleMensalidade()"><option value="VENDA">Venda</option><option value="ALUGUEL">Aluguel</option><option value="STREAMING">Streaming</option></select>
-                                    <div id="boxMensalidade" class="d-none bg-light p-3 border rounded mb-3">
-                                        <label class="small text-danger fw-bold">VALOR MENSAL</label><input type="number" id="valorMensal" class="form-control mb-2" oninput="atualizaTotalDisplay()">
-                                        <label class="small text-danger fw-bold">PRIMEIRO VENCIMENTO</label><input type="date" id="dataPrimeiroVenc" class="form-control">
-                                    </div>
-                                    <label class="small fw-bold mb-1">Peças</label><select id="selProdOrc" class="form-select mb-2" onchange="preencherPreco()"></select>
-                                    <div class="row g-1">
-                                        <div class="col-4"><input type="number" id="qtdItem" class="form-control" value="1"></div>
-                                        <div class="col-5"><input type="number" id="precoItem" class="form-control" placeholder="Preço"></div>
-                                        <div class="col-3"><button onclick="addCarrinho()" class="btn btn-primary w-100"><i class="fas fa-plus"></i></button></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="card p-4">
-                                    <div class="d-flex justify-content-between mb-3"><h6 class="fw-bold">Itens do Pedido</h6><h4 id="displayTotal" class="fw-bold text-primary">R$ 0,00</h4></div>
-                                    <table class="table"><tbody id="tabelaCarrinho"></tbody></table>
-                                    <button onclick="salvarOrcamento()" class="btn btn-warning w-100 mt-3 fw-bold py-3 shadow">GERAR ORÇAMENTO</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tab-pane fade" id="tab-hist-orc">
-                        <div class="card p-0 overflow-hidden"><table class="table mb-0"><tbody id="listaOrcamentos"></tbody></table></div>
-                    </div>
+                    <table class="table table-pro"><thead class="table-light"><tr><th>Item</th><th>Custo</th><th>Venda</th><th>Estoque</th><th>Ação</th></tr></thead><tbody id="tabelaEstoque"></tbody></table>
                 </div>
             </div>
 
             <div id="page-financeiro" class="page-section d-none">
-                <div class="card p-4 mb-4 d-flex flex-row justify-content-between">
-                    <div class="d-flex align-items-center"><label class="fw-bold me-3">Ref:</label><input type="month" id="filtroMes" class="form-control w-auto" onchange="renderFinanceiro()"></div>
+                <div class="card p-4 mb-4 d-flex flex-row justify-content-between flex-wrap gap-2">
+                    <div class="d-flex align-items-center"><label class="fw-bold me-2">Mês:</label><input type="month" id="filtroMes" class="form-control w-auto" onchange="renderFinanceiro()"></div>
                     <button onclick="gerarFaturasDoMesSelecionado()" class="btn btn-primary fw-bold">GERAR COBRANÇAS</button>
                 </div>
                 <div class="card p-0 overflow-hidden"><table class="table mb-0"><thead class="table-light"><tr><th>Vencimento</th><th>Cliente</th><th>Valor</th><th>Status</th><th>Ação</th></tr></thead><tbody id="listaFaturas"></tbody></table></div>
             </div>
 
+            <div id="page-orcamento" class="page-section d-none">
+                 <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card p-4 shadow-sm border-top border-5 border-primary">
+                            <h6 class="fw-bold">Novo Orçamento</h6>
+                            <label class="small fw-bold">Cliente</label><select id="selCliente" class="form-select mb-2"></select>
+                            <label class="small fw-bold">Tipo</label>
+                            <select id="tipoContrato" class="form-select mb-2" onchange="toggleMensalidade()">
+                                <option value="VENDA">Venda</option>
+                                <option value="ALUGUEL">Aluguel</option>
+                                <option value="STREAMING">Streaming</option>
+                            </select>
+                            <div id="boxMensalidade" class="d-none bg-light p-2 rounded mb-2">
+                                <label class="small text-danger fw-bold">Valor Mensal</label><input type="number" id="valorMensal" class="form-control mb-2" oninput="atualizaTotalDisplay()">
+                                <label class="small text-danger fw-bold">Vencimento</label><input type="date" id="dataPrimeiroVenc" class="form-control">
+                            </div>
+                            <hr>
+                            <label class="small fw-bold">Item</label><select id="selProdOrc" class="form-select mb-2" onchange="preencherPreco()"></select>
+                            <div class="row g-1">
+                                <div class="col-4"><input type="number" id="qtdItem" class="form-control" value="1"></div>
+                                <div class="col-8"><button onclick="addCarrinho()" class="btn btn-primary w-100">Adicionar</button></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card p-4">
+                            <h5 id="displayTotal" class="fw-bold text-primary">Total: R$ 0,00</h5>
+                            <table class="table"><tbody id="tabelaCarrinho"></tbody></table>
+                            <button onclick="salvarOrcamento()" class="btn btn-warning w-100 mt-3 fw-bold">SALVAR ORÇAMENTO</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div id="page-contratos" class="page-section d-none">
-                <h4 class="fw-bold mb-4">Contratos em Vigência</h4>
+                <h4 class="fw-bold mb-4">Contratos Ativos</h4>
                 <div class="card p-0 overflow-hidden"><table class="table mb-0"><thead class="table-light"><tr><th>Cliente</th><th>Tipo</th><th>Vencimento</th><th>Valor</th><th>Ação</th></tr></thead><tbody id="listaContratosAtivos"></tbody></table></div>
             </div>
 
@@ -177,31 +191,46 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
     const DB = {
-        clientes: JSON.parse(localStorage.getItem('kp21_clientes')) || [],
-        produtos: JSON.parse(localStorage.getItem('kp21_produtos')) || [],
-        orcamentos: JSON.parse(localStorage.getItem('kp21_orcamentos')) || [],
-        contratos: JSON.parse(localStorage.getItem('kp21_contratos')) || [],
-        faturas: JSON.parse(localStorage.getItem('kp21_faturas')) || []
+        clientes: JSON.parse(localStorage.getItem('kp22_clientes')) || [],
+        produtos: JSON.parse(localStorage.getItem('kp22_produtos')) || [],
+        orcamentos: JSON.parse(localStorage.getItem('kp22_orcamentos')) || [],
+        contratos: JSON.parse(localStorage.getItem('kp22_contratos')) || [],
+        faturas: JSON.parse(localStorage.getItem('kp22_faturas')) || []
     };
-    function saveDB() { Object.keys(DB).forEach(k => localStorage.setItem('kp21_'+k, JSON.stringify(DB[k]))); }
+    function saveDB() { Object.keys(DB).forEach(k => localStorage.setItem('kp22_'+k, JSON.stringify(DB[k]))); }
 
     function showToast(msg, type='info') {
         const t = document.createElement('div');
-        t.className = `alert alert-${type} shadow-lg py-2 px-4`;
+        t.className = `alert alert-${type} shadow-lg py-2 px-4 mb-2`;
         t.innerText = msg;
         document.getElementById('toast-container').appendChild(t);
         setTimeout(() => t.remove(), 3000);
     }
 
-    function fazerLogin() { if(document.getElementById('loginPass').value==='1234'){ document.getElementById('login-screen').classList.add('d-none'); document.getElementById('app-content').classList.remove('d-none'); initSystem(); } else showToast('Senha Errada', 'danger'); }
+    function fazerLogin() { 
+        if(document.getElementById('loginPass').value==='1234'){ 
+            document.getElementById('login-screen').classList.add('d-none'); 
+            document.getElementById('app-content').classList.remove('d-none'); 
+            document.getElementById('mobile-top-bar').style.display = 'flex';
+            initSystem(); 
+        } else showToast('Senha Errada', 'danger'); 
+    }
     
     function nav(p, btn) {
         document.querySelectorAll('.page-section').forEach(el=>el.classList.add('d-none'));
         document.getElementById('page-'+p).classList.remove('d-none');
         document.querySelectorAll('.sidebar-btn').forEach(b=>b.classList.remove('active'));
         if(btn) btn.classList.add('active');
+        
+        // Fecha menu mobile ao clicar
+        const menu = document.getElementById('menuMobile');
+        const bsCollapse = bootstrap.Collapse.getInstance(menu);
+        if (bsCollapse) bsCollapse.hide();
+
         if(p==='dashboard') updateDashboard();
         if(p==='financeiro') renderFinanceiro();
         if(p==='contratos') renderContratosAtivos();
@@ -238,12 +267,18 @@
         if(id) {
             const idx = DB.clientes.findIndex(c => c.id == id);
             DB.clientes[idx] = obj;
-            showToast('Cliente Atualizado!');
         } else {
             DB.clientes.push(obj);
-            showToast('Cliente Cadastrado!');
         }
-        saveDB(); resetCliForm(); renderClientes();
+        saveDB(); resetCliForm(); renderClientes(); showToast('Cliente Salvo!');
+    }
+    function renderClientes() {
+        const tb=document.getElementById('listaClientes'); const sel=document.getElementById('selCliente');
+        tb.innerHTML=''; sel.innerHTML='<option value="">Selecione...</option>';
+        DB.clientes.forEach(c=>{
+            tb.innerHTML+=`<tr><td class="fw-bold">${c.nome}</td><td>${c.tel}</td><td class="text-end"><button onclick="editarCliente(${c.id})" class="btn btn-sm btn-light">Editar</button></td></tr>`;
+            sel.innerHTML+=`<option value="${c.id}">${c.nome}</option>`;
+        });
     }
     function editarCliente(id) {
         const c = DB.clientes.find(x => x.id == id);
@@ -253,24 +288,9 @@
         document.getElementById('cliTel').value = c.tel;
         document.getElementById('cliRua').value = c.rua;
         document.getElementById('cliNum').value = c.num;
-        document.getElementById('clienteFormTitle').innerText = 'Editar Cliente';
-        document.getElementById('btnCancelCli').classList.remove('d-none');
-        window.scrollTo(0,0);
+        nav('clientes');
     }
-    function resetCliForm() {
-        document.getElementById('cliIdEdit').value = '';
-        document.querySelectorAll('#page-clientes input').forEach(i => i.value = '');
-        document.getElementById('clienteFormTitle').innerText = 'Cadastrar Novo Cliente';
-        document.getElementById('btnCancelCli').classList.add('d-none');
-    }
-    function renderClientes() {
-        const tb=document.getElementById('listaClientes'); const sel=document.getElementById('selCliente');
-        tb.innerHTML=''; sel.innerHTML='<option value="">Selecione...</option>';
-        DB.clientes.forEach(c=>{
-            tb.innerHTML+=`<tr><td class="fw-bold">${c.nome}</td><td>${c.tel}</td><td class="text-end"><button onclick="editarCliente(${c.id})" class="btn btn-sm btn-light"><i class="fas fa-edit"></i></button></td></tr>`;
-            sel.innerHTML+=`<option value="${c.id}">${c.nome}</option>`;
-        });
-    }
+    function resetCliForm() { document.querySelectorAll('#page-clientes input').forEach(i => i.value = ''); }
 
     // --- ESTOQUE ---
     function salvarProduto() {
@@ -281,8 +301,7 @@
         const tb=document.getElementById('tabelaEstoque'); const sel=document.getElementById('selProdOrc');
         tb.innerHTML=''; sel.innerHTML='<option value="">Selecione...</option>';
         DB.produtos.forEach(p => {
-            let m = p.venda > 0 ? ((p.venda - p.custo) / p.venda) * 100 : 0;
-            tb.innerHTML+=`<tr><td class="fw-bold">${p.nome}</td><td>R$ ${p.custo}</td><td>R$ ${p.venda}</td><td>${m.toFixed(0)}%</td><td>${p.tipo==='PRODUTO'?p.qtd:'∞'}</td><td>-</td></tr>`;
+            tb.innerHTML+=`<tr><td class="fw-bold">${p.nome}</td><td>R$ ${p.custo}</td><td>R$ ${p.venda}</td><td>${p.tipo==='PRODUTO'?p.qtd:'∞'}</td><td>-</td></tr>`;
             sel.innerHTML+=`<option value="${p.id}" data-preco="${p.venda}">${p.nome}</option>`;
         });
     }
@@ -296,44 +315,36 @@
         atualizaTotalDisplay();
     }
     function preencherPreco(){ const s=document.getElementById('selProdOrc'); document.getElementById('precoItem').value=s.options[s.selectedIndex].getAttribute('data-preco'); }
-    function addCarrinho(){ const pid=parseInt(document.getElementById('selProdOrc').value); const p=DB.produtos.find(x=>x.id===pid); const pr=parseFloat(document.getElementById('precoItem').value); if(p && pr>=0){carrinho.push({...p, venda:pr, qtdCarrinho:parseInt(document.getElementById('qtdItem').value)}); renderCarrinho();}}
-    function renderCarrinho(){ const tb=document.getElementById('tabelaCarrinho'); tb.innerHTML=''; let t=0; carrinho.forEach((i,idx)=>{t+=i.venda*i.qtdCarrinho; tb.innerHTML+=`<tr><td>${i.nome}</td><td>${i.qtdCarrinho}x</td><td>R$ ${i.venda}</td><td><button onclick="carrinho.splice(${idx},1);renderCarrinho()" class="btn btn-sm text-danger">x</button></td></tr>`;}); atualizaTotalDisplay(t); }
+    function addCarrinho(){ 
+        const pid=parseInt(document.getElementById('selProdOrc').value); 
+        const p=DB.produtos.find(x=>x.id===pid); 
+        if(p){carrinho.push({...p, venda:parseFloat(document.getElementById('precoItem').value), qtdCarrinho:parseInt(document.getElementById('qtdItem').value)}); renderCarrinho();}
+    }
+    function renderCarrinho(){ const tb=document.getElementById('tabelaCarrinho'); tb.innerHTML=''; let t=0; carrinho.forEach((i,idx)=>{t+=i.venda*i.qtdCarrinho; tb.innerHTML+=`<tr><td>${i.nome}</td><td>${i.qtdCarrinho}x</td><td>R$ ${i.venda}</td><td><button onclick="carrinho.splice(${idx},1);renderCarrinho()" class="btn btn-sm text-danger">x</button></td></tr>`;}); atualizaTotalDisplay();}
     function atualizaTotalDisplay(){
         const tipo=document.getElementById('tipoContrato').value;
         let t=0; carrinho.forEach(i=>t+=i.venda*i.qtdCarrinho);
-        document.getElementById('displayTotal').innerText = (tipo==='VENDA') ? `TOTAL: R$ ${t.toFixed(2)}` : `MENSAL: R$ ${parseFloat(document.getElementById('valorMensal').value || 0).toFixed(2)}`;
+        document.getElementById('displayTotal').innerText = (tipo==='VENDA') ? `Total: R$ ${t.toFixed(2)}` : `Mensal: R$ ${parseFloat(document.getElementById('valorMensal').value || 0).toFixed(2)}`;
     }
     function salvarOrcamento(){
         const cid=parseInt(document.getElementById('selCliente').value);
-        const tipo=document.getElementById('tipoContrato').value;
-        if(!cid) return showToast('Selecione um cliente!', 'danger');
+        if(!cid) return showToast('Selecione um cliente!');
         const cli=DB.clientes.find(c=>c.id===cid);
+        const tipo=document.getElementById('tipoContrato').value;
         const valFinal = (tipo==='VENDA') ? carrinho.reduce((a,b)=>a+(b.venda*b.qtdCarrinho),0) : parseFloat(document.getElementById('valorMensal').value);
         const orc = {id:Date.now(), data:new Date().toISOString(), clienteId:cid, clienteNome:cli.nome, tipo:tipo, itens:carrinho, valorFinal:valFinal, dataVencimento:document.getElementById('dataPrimeiroVenc').value, status:'PENDENTE'};
-        DB.orcamentos.push(orc); saveDB(); renderHistoricoOrcamentos(); carrinho=[]; showToast('Orçamento Criado!'); gerarPDF(orc);
+        DB.orcamentos.push(orc); saveDB(); renderHistoricoOrcamentos(); carrinho=[]; showToast('Orçamento Criado!');
     }
     function renderHistoricoOrcamentos(){
         const tb=document.getElementById('listaOrcamentos'); tb.innerHTML='';
         DB.orcamentos.forEach(o=>{
-            if(o.status==='PENDENTE') tb.innerHTML+=`<tr><td class="small">${new Date(o.data).toLocaleDateString()}</td><td class="fw-bold">${o.clienteNome}</td><td>${o.tipo}</td><td>R$ ${o.valorFinal.toFixed(2)}</td><td><button onclick="aprovarOrcamento(${o.id})" class="btn btn-sm btn-success"><i class="fas fa-check"></i></button></td></tr>`;
+            if(o.status==='PENDENTE') tb.innerHTML+=`<tr><td>${new Date(o.data).toLocaleDateString()}</td><td>${o.clienteNome}</td><td>R$ ${o.valorFinal}</td><td><button onclick="aprovarOrcamento(${o.id})" class="btn btn-sm btn-success">Aprovar</button></td></tr>`;
         });
     }
 
-    // --- APROVAÇÃO & LOGICA ESTOQUE ---
+    // --- APROVAÇÃO & FINANCEIRO ---
     function aprovarOrcamento(id){
         const o=DB.orcamentos.find(x=>x.id===id);
-        
-        // Validação Estoque
-        let semEstoque = false;
-        o.itens.forEach(item => {
-            if(item.tipo === 'PRODUTO') {
-                const p = DB.produtos.find(prod => prod.id === item.id);
-                if(p.qtd < item.qtdCarrinho) semEstoque = item.nome;
-            }
-        });
-
-        if(semEstoque) return showToast(`Erro: Estoque insuficiente para ${semEstoque}`, 'danger');
-
         o.status='APROVADO';
         if(o.tipo==='VENDA'){
             DB.faturas.push({id:Date.now(), clienteNome:o.clienteNome, descricao:'Venda', valor:o.valorFinal, vencimentoIso:new Date().toISOString().split('T')[0], status:'ABERTO', tipo:'VENDA', itens: o.itens});
@@ -341,20 +352,17 @@
             DB.contratos.push({...o, status:'ATIVO', inicio:new Date().toLocaleDateString()});
         }
         o.itens.forEach(i=>{if(i.tipo==='PRODUTO'){const p=DB.produtos.find(x=>x.id===i.id); if(p)p.qtd-=i.qtdCarrinho;}});
-        saveDB(); renderHistoricoOrcamentos(); renderEstoque(); showToast('Venda Aprovada e Estoque Baixado!', 'success');
+        saveDB(); renderHistoricoOrcamentos(); showToast('Venda Aprovada!', 'success');
     }
-
     function renderFinanceiro(){
         const tb=document.getElementById('listaFaturas'); tb.innerHTML='';
         const m=document.getElementById('filtroMes').value;
         DB.faturas.forEach(f=>{
             if(m && !f.vencimentoIso.startsWith(m)) return;
-            const status = (f.status==='ABERTO' && f.vencimentoIso < new Date().toISOString().split('T')[0]) ? 'VENCIDO' : f.status;
-            const btn = f.status==='ABERTO' ? `<button onclick="darBaixa(${f.id})" class="btn btn-sm btn-success">Receber</button>` : '✓ PAGO';
-            tb.innerHTML+=`<tr><td>${f.vencimentoIso}</td><td class="fw-bold">${f.clienteNome}</td><td>R$ ${f.valor}</td><td>${status}</td><td>${btn}</td></tr>`;
+            const btn = f.status==='ABERTO' ? `<button onclick="darBaixa(${f.id})" class="btn btn-sm btn-success">Receber</button>` : 'PAGO';
+            tb.innerHTML+=`<tr><td>${f.vencimentoIso}</td><td>${f.clienteNome}</td><td>R$ ${f.valor}</td><td>${f.status}</td><td>${btn}</td></tr>`;
         });
     }
-
     function gerarFaturasDoMesSelecionado(){
         const m=document.getElementById('filtroMes').value;
         DB.contratos.forEach(c=>{
@@ -369,8 +377,15 @@
         });
         saveDB(); renderFinanceiro(); showToast('Faturas Geradas!');
     }
-
-    function darBaixa(id){ const f=DB.faturas.find(x=>x.id==id); f.status='PAGO'; saveDB(); renderFinanceiro(); updateDashboard(); showToast('Pagamento Confirmado!'); }
+    function darBaixa(id){ const f=DB.faturas.find(x=>x.id==id); f.status='PAGO'; saveDB(); renderFinanceiro(); updateDashboard(); }
+    
+    function renderContratosAtivos(){
+        const tb=document.getElementById('listaContratosAtivos'); tb.innerHTML='';
+        DB.contratos.forEach(c=>{
+            if(c.status==='ATIVO') tb.innerHTML+=`<tr><td>${c.clienteNome}</td><td>${c.tipo}</td><td>${c.dataVencimento}</td><td>R$ ${c.valorFinal}</td><td><button onclick="encerrarContrato(${c.id})" class="btn btn-sm btn-outline-danger">Parar</button></td></tr>`;
+        });
+    }
+    function encerrarContrato(id){ const c=DB.contratos.find(x=>x.id===id); c.status='ENCERRADO'; saveDB(); renderContratosAtivos(); }
 
     function updateDashboard(){
         const h=new Date().toISOString().split('T')[0]; 
@@ -378,40 +393,14 @@
         DB.faturas.forEach(x=>{ 
             if(x.status==='PAGO') {
                 bruto += x.valor;
-                // Calcula custo dos itens da fatura
                 if(x.itens) x.itens.forEach(i => custo += (i.custo * i.qtdCarrinho));
             } else if(x.vencimentoIso<h) vencido+=x.valor; 
             else futuro+=x.valor; 
         });
         document.getElementById('dashBruto').innerText=`R$ ${bruto.toFixed(2)}`;
         document.getElementById('dashLucro').innerText=`R$ ${(bruto - custo).toFixed(2)}`;
-        document.getElementById('dashVencido').innerText=`R$ ${vencido.toFixed(2)}`;
+        document.getElementById('dashVencidoc').innerText=`R$ ${vencido.toFixed(2)}`;
         document.getElementById('dashFuturo').innerText=`R$ ${futuro.toFixed(2)}`;
-    }
-
-    function renderContratosAtivos(){
-        const tb=document.getElementById('listaContratosAtivos'); tb.innerHTML='';
-        DB.contratos.forEach(c=>{
-            if(c.status==='ATIVO') tb.innerHTML+=`<tr><td class="fw-bold">${c.clienteNome}</td><td>${c.tipo}</td><td>${c.dataVencimento}</td><td>R$ ${c.valorFinal}</td><td><button onclick="encerrarContrato(${c.id})" class="btn btn-sm btn-outline-danger">Parar</button></td></tr>`;
-        });
-    }
-    function encerrarContrato(id){ const c=DB.contratos.find(x=>x.id===id); c.status='ENCERRADO'; saveDB(); renderContratosAtivos(); showToast('Contrato Encerrado.'); }
-
-    function gerarPDF(p){
-        const {jsPDF}=window.jspdf; const doc=new jsPDF();
-        const cli=DB.clientes.find(c=>c.id===p.clienteId);
-        doc.setFillColor(30,30,45); doc.rect(0,0,210,40,'F');
-        doc.setTextColor(0,210,255); doc.setFontSize(22); doc.text("KELVIN EDUARDO", 105, 18, 'center');
-        doc.setTextColor(255,255,255); doc.setFontSize(10); doc.text("CNPJ: 52.975.677/0001-49 | Ribeirão Preto-SP", 105, 26, 'center');
-        doc.setTextColor(0,0,0); doc.text(`O.S. #${p.id} | Data: ${new Date().toLocaleDateString()}`, 14, 48);
-        doc.setFontSize(10); doc.text(`Cliente: ${cli.nome} | CPF/CNPJ: ${cli.doc}`, 14, 58);
-        doc.text(`End: ${cli.rua}, ${cli.num} | Tel: ${cli.tel}`, 14, 64);
-        doc.autoTable({startY:75, head:[['Item','Qtd','Preço']], body:p.itens.map(i=>[i.nome,i.qtdCarrinho,`R$ ${i.venda}`])});
-        doc.setFont(undefined, 'bold');
-        doc.text(p.tipo==='VENDA'?`TOTAL GERAL: R$ ${p.valorFinal}`:`MENSALIDADE: R$ ${p.valorFinal}`, 14, doc.lastAutoTable.finalY+10);
-        doc.text(`CHAVE PIX: 52975677000149 (CNPJ)`, 14, doc.lastAutoTable.finalY+20);
-        doc.setFontSize(8); doc.text(`Orçamento válido por 5 dias.`, 14, doc.lastAutoTable.finalY+30);
-        doc.save(`Kelvin_OS_${p.id}.pdf`);
     }
 
     function initSystem(){ 
@@ -419,6 +408,5 @@
         renderEstoque(); renderClientes(); updateDashboard(); 
     }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
