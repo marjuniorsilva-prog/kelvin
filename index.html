@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SISTEMA KELVIN v1.9</title>
+    <title>SISTEMA KELVIN v2.0</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -87,6 +87,10 @@
         <div class="collapse w-100 d-md-none bg-dark" id="menuMobile">
             <button class="btn sidebar-btn" onclick="nav('dashboard')">Dashboard</button>
             <button class="btn sidebar-btn" onclick="nav('financeiro')">Financeiro</button>
+            <button class="btn sidebar-btn" onclick="nav('orcamento')">Orçamentos</button>
+            <button class="btn sidebar-btn" onclick="nav('contratos')">Contratos Ativos</button>
+            <button class="btn sidebar-btn" onclick="nav('estoque')">Estoque</button>
+            <button class="btn sidebar-btn" onclick="nav('clientes')">Clientes</button>
         </div>
 
         <div class="col-md-10 p-4">
@@ -144,7 +148,7 @@
                                 <th>Vencimento</th>
                                 <th>Cliente</th>
                                 <th>Tipo</th>
-                                <th>Referência</th>
+                                <th>Ref</th>
                                 <th>Valor</th>
                                 <th>Status</th>
                                 <th>Ação</th>
@@ -190,20 +194,20 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="tab-hist">
-                        <div class="card card-custom table-responsive"><table class="table m-0"><tbody id="listaOrcamentos"></tbody></table></div>
+                        <div class="card card-custom table-responsive"><table class="table table-hover m-0"><tbody id="listaOrcamentos"></tbody></table></div>
                     </div>
                 </div>
             </div>
 
             <div id="page-contratos" class="page-section d-none">
                 <h3>Contratos Ativos</h3>
-                <div class="card card-custom table-responsive"><table class="table m-0"><tbody id="listaContratosAtivos"></tbody></table></div>
+                <div class="card card-custom table-responsive"><table class="table table-hover m-0"><tbody id="listaContratosAtivos"></tbody></table></div>
             </div>
 
             <div id="page-estoque" class="page-section d-none">
                 <div class="card card-custom p-3 mb-3">
                     <div class="row g-2">
-                        <div class="col-md-2"><select id="prodTipo" class="form-select" onchange="toggleEstoque()"><option value="PRODUTO">Produto</option><option value="SERVICO">Serviço</option></select></div>
+                        <div class="col-md-2"><select id="prodTipo" class="form-select" onchange="toggleEstoqueInput()"><option value="PRODUTO">Produto</option><option value="SERVICO">Serviço</option></select></div>
                         <div class="col-md-4"><input type="text" id="prodNome" class="form-control" placeholder="Nome"></div>
                         <div class="col-md-2"><input type="number" id="prodCusto" class="form-control" placeholder="Custo"></div>
                         <div class="col-md-2"><input type="number" id="prodVenda" class="form-control" placeholder="Venda"></div>
@@ -211,7 +215,7 @@
                         <div class="col-12 text-end"><button onclick="salvarProduto()" class="btn btn-dark">Cadastrar</button></div>
                     </div>
                 </div>
-                <div class="card card-custom table-responsive"><table class="table m-0"><tbody id="tabelaEstoque"></tbody></table></div>
+                <div class="card card-custom table-responsive"><table class="table table-hover m-0"><tbody id="tabelaEstoque"></tbody></table></div>
             </div>
 
             <div id="page-clientes" class="page-section d-none">
@@ -224,7 +228,7 @@
                         <div class="col-md-12 text-end"><button onclick="salvarCliente()" class="btn btn-primary">Salvar</button></div>
                     </div>
                 </div>
-                <div class="card card-custom table-responsive"><table class="table m-0"><tbody id="listaClientes"></tbody></table></div>
+                <div class="card card-custom table-responsive"><table class="table table-hover m-0"><tbody id="listaClientes"></tbody></table></div>
             </div>
 
         </div>
@@ -233,22 +237,35 @@
 
 <script>
     const DB = {
-        clientes: JSON.parse(localStorage.getItem('k19_clientes')) || [],
-        produtos: JSON.parse(localStorage.getItem('k19_produtos')) || [],
-        orcamentos: JSON.parse(localStorage.getItem('k19_orcamentos')) || [],
-        contratos: JSON.parse(localStorage.getItem('k19_contratos')) || [],
-        faturas: JSON.parse(localStorage.getItem('k19_faturas')) || []
+        clientes: JSON.parse(localStorage.getItem('k20_clientes')) || [],
+        produtos: JSON.parse(localStorage.getItem('k20_produtos')) || [],
+        orcamentos: JSON.parse(localStorage.getItem('k20_orcamentos')) || [],
+        contratos: JSON.parse(localStorage.getItem('k20_contratos')) || [],
+        faturas: JSON.parse(localStorage.getItem('k20_faturas')) || []
     };
     function saveDB() {
-        localStorage.setItem('k19_clientes', JSON.stringify(DB.clientes));
-        localStorage.setItem('k19_produtos', JSON.stringify(DB.produtos));
-        localStorage.setItem('k19_orcamentos', JSON.stringify(DB.orcamentos));
-        localStorage.setItem('k19_contratos', JSON.stringify(DB.contratos));
-        localStorage.setItem('k19_faturas', JSON.stringify(DB.faturas));
+        localStorage.setItem('k20_clientes', JSON.stringify(DB.clientes));
+        localStorage.setItem('k20_produtos', JSON.stringify(DB.produtos));
+        localStorage.setItem('k20_orcamentos', JSON.stringify(DB.orcamentos));
+        localStorage.setItem('k20_contratos', JSON.stringify(DB.contratos));
+        localStorage.setItem('k20_faturas', JSON.stringify(DB.faturas));
     }
 
     function fazerLogin() { if(document.getElementById('loginPass').value==='1234'){ document.getElementById('login-screen').style.display='none'; document.getElementById('app-content').classList.remove('d-none'); initSystem(); } else alert('Senha errada'); }
-    function nav(p) { document.querySelectorAll('.page-section').forEach(el=>el.classList.add('d-none')); document.getElementById('page-'+p).classList.remove('d-none'); if(p==='dashboard') updateDashboard(); if(p==='financeiro') renderFinanceiro(); }
+    
+    // --- NAVEGAÇÃO CORRIGIDA ---
+    function nav(p) { 
+        document.querySelectorAll('.page-section').forEach(el=>el.classList.add('d-none')); 
+        document.getElementById('page-'+p).classList.remove('d-none'); 
+        
+        // Fecha menu mobile
+        const menu = document.getElementById('menuMobile');
+        if(menu.classList.contains('show')) new bootstrap.Collapse(menu).hide();
+
+        if(p==='dashboard') updateDashboard(); 
+        if(p==='financeiro') renderFinanceiro(); 
+        if(p==='contratos') renderContratosAtivos();
+    }
 
     // --- DATAS E FILTROS ---
     function getMesAtualInput() {
@@ -267,7 +284,7 @@
     }
 
     function gerarFaturasDoMesSelecionado() {
-        const inputMes = document.getElementById('filtroMes').value; // Ex: "2026-03"
+        const inputMes = document.getElementById('filtroMes').value; 
         if(!inputMes) return alert("Selecione um mês no calendário!");
 
         const [ano, mes] = inputMes.split('-');
@@ -277,14 +294,11 @@
         DB.contratos.forEach(c => {
             if(c.status !== 'ATIVO') return;
 
-            // Chave única: ContratoID + Ano-Mes
             const chaveUnica = `${c.id}-${inputMes}`;
             const jaExiste = DB.faturas.find(f => f.chaveUnica === chaveUnica);
 
             if(!jaExiste) {
-                // Cria data de vencimento real
                 const diaVenc = c.diaVencimento || 10;
-                // Formato YYYY-MM-DD para ordenação correta
                 const dataVencimentoIso = `${ano}-${mes}-${String(diaVenc).padStart(2,'0')}`;
 
                 DB.faturas.push({
@@ -305,37 +319,26 @@
 
     function renderFinanceiro() {
         const tb = document.getElementById('listaFaturas'); tb.innerHTML = '';
-        const inputMes = document.getElementById('filtroMes').value; // Filtro de tempo
+        const inputMes = document.getElementById('filtroMes').value; 
         
-        // Ordenar por data
         DB.faturas.sort((a,b) => a.vencimentoIso.localeCompare(b.vencimentoIso));
 
         DB.faturas.forEach(f => {
-            // Filtro de Mês: Se o usuário selecionou Março/2026, mostra só Março.
-            // A fatura tem vencimentoIso "2026-03-10". O input tem "2026-03".
             if(inputMes && !f.vencimentoIso.startsWith(inputMes)) return;
 
-            // Lógica de Vencido
             let statusReal = f.status;
             const hojeIso = new Date().toISOString().split('T')[0];
             
-            if(f.status === 'ABERTO' && f.vencimentoIso < hojeIso) {
-                statusReal = 'VENCIDO';
-            }
-
-            // Filtro de Botões (Vencido, Pago, Todos)
+            if(f.status === 'ABERTO' && f.vencimentoIso < hojeIso) statusReal = 'VENCIDO';
             if(statusFiltro !== 'TODOS' && statusReal !== statusFiltro) {
-                // Pequeno ajuste: Se filtrei VENCIDO, mostro quem é ABERTO+ATRASADO
                 if(statusFiltro === 'VENCIDO' && statusReal !== 'VENCIDO') return;
                 if(statusFiltro === 'PAGO' && statusReal !== 'PAGO') return;
             }
 
-            // Visual
             let badgeClass = 'badge-aberto';
             if(statusReal === 'PAGO') badgeClass = 'badge-pago';
             if(statusReal === 'VENCIDO') badgeClass = 'badge-vencido';
 
-            // Converter data ISO para PT-BR visual
             const [ano, mes, dia] = f.vencimentoIso.split('-');
             const dataPtBr = `${dia}/${mes}/${ano}`;
 
@@ -366,17 +369,13 @@
         }
     }
 
-    // --- DASHBOARD (INTELIGENTE) ---
     function updateDashboard() {
         const hojeIso = new Date().toISOString().split('T')[0];
-        let recebido = 0;
-        let vencido = 0;
-        let futuro = 0;
+        let recebido = 0, vencido = 0, futuro = 0;
 
         DB.faturas.forEach(f => {
-            if(f.status === 'PAGO') {
-                recebido += f.valor;
-            } else if (f.status === 'ABERTO') {
+            if(f.status === 'PAGO') recebido += f.valor;
+            else if (f.status === 'ABERTO') {
                 if(f.vencimentoIso < hojeIso) vencido += f.valor;
                 else futuro += f.valor;
             }
@@ -387,22 +386,19 @@
         document.getElementById('dashFuturo').innerText = `R$ ${futuro.toFixed(2)}`;
     }
 
-    // --- RESTO DO SISTEMA (SIMPLIFICADO PARA CABER) ---
     function initSystem() { 
-        document.getElementById('filtroMes').value = getMesAtualInput(); // Seta mês atual
+        document.getElementById('filtroMes').value = getMesAtualInput(); 
         renderEstoque(); renderClientes(); updateDashboard(); 
     }
     
-    // Funções de Estoque, Clientes, Orçamento e Contratos mantidas da v1.8 (mas compactadas aqui)
-    // ... (Mantém a lógica de Salvar Produto, Cliente, Orçamento e Gerar PDF da v1.8) ...
-    // Estou incluindo as essenciais para funcionar:
-    
+    // --- ESTOQUE E CLIENTES ---
     function salvarProduto() { DB.produtos.push({id:Date.now(), tipo:document.getElementById('prodTipo').value, nome:document.getElementById('prodNome').value, custo:parseFloat(document.getElementById('prodCusto').value)||0, venda:parseFloat(document.getElementById('prodVenda').value)||0, qtd:parseInt(document.getElementById('prodQtd').value)||0}); saveDB(); renderEstoque(); document.getElementById('prodNome').value=''; }
     function renderEstoque() { const tb=document.getElementById('tabelaEstoque'); const sel=document.getElementById('selProdOrc'); tb.innerHTML=''; sel.innerHTML='<option value="">Selecione</option>'; DB.produtos.forEach(p=>{ tb.innerHTML+=`<tr><td>${p.nome}</td><td>${p.tipo}</td><td>${p.custo}</td><td>${p.venda}</td><td>${p.tipo==='SERVICO'?'∞':p.qtd}</td><td>-</td></tr>`; sel.innerHTML+=`<option value="${p.id}" data-preco="${p.venda}">${p.nome}</option>`; }); }
-    function salvarCliente() { DB.clientes.push({id:Date.now(), nome:document.getElementById('cliNome').value, doc:'', tel:'', end:''}); saveDB(); renderClientes(); }
+    function salvarCliente() { DB.clientes.push({id:Date.now(), nome:document.getElementById('cliNome').value, doc:'', tel:'', end: `${document.getElementById('cliRua').value}, ${document.getElementById('cliNum').value}`}); saveDB(); renderClientes(); }
     function renderClientes() { const tb=document.getElementById('listaClientes'); const sel=document.getElementById('selCliente'); tb.innerHTML=''; sel.innerHTML='<option value="">Selecione</option>'; DB.clientes.forEach(c=>{ tb.innerHTML+=`<tr><td>${c.nome}</td><td>-</td><td>-</td></tr>`; sel.innerHTML+=`<option value="${c.id}">${c.nome}</option>`; }); }
-    
-    // ORÇAMENTO
+    function toggleEstoqueInput() { const t=document.getElementById('prodTipo').value; document.getElementById('prodQtd').disabled = (t==='SERVICO'); }
+
+    // --- ORÇAMENTO ---
     let carrinho=[];
     function toggleMensalidade(){const t=document.getElementById('tipoContrato').value; if(t==='VENDA')document.getElementById('boxMensalidade').classList.add('d-none');else document.getElementById('boxMensalidade').classList.remove('d-none');}
     function preencherPreco(){const s=document.getElementById('selProdOrc'); document.getElementById('precoItem').value=s.options[s.selectedIndex].getAttribute('data-preco');}
@@ -417,7 +413,7 @@
         const val=tipo==='VENDA'?0:parseFloat(document.getElementById('valorMensal').value);
         
         DB.orcamentos.push({id:Date.now(), data:new Date().toISOString(), clienteId:cid, clienteNome:cli.nome, tipo:tipo, itens:carrinho, valorFinal:val, diaVencimento:dia, status:'PENDENTE'});
-        saveDB(); renderHistoricoOrcamentos(); carrinho=[];
+        saveDB(); renderHistoricoOrcamentos(); carrinho=[]; alert('Salvo Pendente');
     }
     function renderHistoricoOrcamentos(){
         const tb=document.getElementById('listaOrcamentos'); tb.innerHTML='';
@@ -428,7 +424,6 @@
         if(o){
             o.status='APROVADO';
             if(o.tipo==='VENDA'){
-                 // Gera Fatura Venda Imediata
                  const hoje = new Date();
                  const iso = hoje.toISOString().split('T')[0];
                  const ref = `${hoje.getMonth()+1}/${hoje.getFullYear()}`;
@@ -436,14 +431,41 @@
             } else {
                 DB.contratos.push({...o, status:'ATIVO', inicio:new Date().toLocaleDateString()});
             }
-            saveDB(); renderHistoricoOrcamentos(); renderContratosAtivos(); alert('Aprovado');
+            // Baixa Estoque
+            o.itens.forEach(i => {
+                if(i.tipo === 'PRODUTO') {
+                    const p = DB.produtos.find(x => x.id === i.id);
+                    if(p) p.qtd -= i.qtdCarrinho;
+                }
+            });
+            saveDB(); renderHistoricoOrcamentos(); renderContratosAtivos(); renderEstoque(); alert('Aprovado');
         }
     }
     function renderContratosAtivos(){
         const tb=document.getElementById('listaContratosAtivos'); tb.innerHTML='';
-        DB.contratos.forEach(c=>{ if(c.status==='ATIVO') tb.innerHTML+=`<tr><td>${c.clienteNome}</td><td>${c.tipo}</td><td>Dia ${c.diaVencimento}</td><td>R$ ${c.valorFinal}</td><td>${c.inicio}</td><td>-</td></tr>`; });
+        DB.contratos.forEach(c=>{ if(c.status==='ATIVO') tb.innerHTML+=`<tr><td>${c.clienteNome}</td><td>${c.tipo}</td><td>Dia ${c.diaVencimento}</td><td>R$ ${c.valorFinal}</td><td>${c.inicio}</td><td><button onclick="encerrarContrato(${c.id})" class="btn btn-sm btn-outline-danger">Encerrar</button></td></tr>`; });
     }
-    async function buscarCep() {/*mesmo código v1.8*/}
+    function encerrarContrato(id) {
+        const c = DB.contratos.find(cnt => cnt.id === id);
+        if(!c) return;
+        if(confirm("Devolver itens ao estoque?")) {
+            c.itens.forEach(item => { if(item.tipo === 'PRODUTO') { const p = DB.produtos.find(prod => prod.id === item.id); if(p) p.qtd += item.qtdCarrinho; } });
+        }
+        c.status = 'CANCELADO'; saveDB(); renderContratosAtivos(); renderEstoque();
+    }
+    async function buscarCep() {
+        let cep = document.getElementById('cliCep').value.replace(/\D/g,'');
+        if(cep.length===8){
+            try{
+                let r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                let d = await r.json();
+                if(!d.erro){
+                    document.getElementById('cliRua').value = d.logradouro;
+                    document.getElementById('cliNum').focus();
+                }
+            }catch(e){}
+        }
+    }
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
