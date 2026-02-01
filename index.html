@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SISTEMA KELVIN v1.4</title>
+    <title>SISTEMA KELVIN v1.5</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -42,6 +42,7 @@
         .form-control:focus {
             border-color: #2c3e50; box-shadow: 0 0 0 0.2rem rgba(44, 62, 80, 0.25);
         }
+        .form-control[readonly] { background-color: #e9ecef; } /* Campo travado cor cinza */
 
         /* SIDEBAR */
         .sidebar-btn {
@@ -92,6 +93,7 @@
             <button class="btn sidebar-btn" onclick="nav('financeiro')">Financeiro</button>
             <button class="btn sidebar-btn" onclick="nav('orcamento')">Novo Contrato</button>
             <button class="btn sidebar-btn" onclick="nav('estoque')">Estoque</button>
+            <button class="btn sidebar-btn" onclick="nav('clientes')">Clientes</button>
         </div>
 
         <div class="col-md-10 p-4">
@@ -126,7 +128,6 @@
                     <button onclick="gerarFaturasDoMes()" class="btn btn-primary shadow-sm"><i class="fas fa-sync"></i> Gerar Cobranças do Mês</button>
                 </div>
 
-                <p class="mb-1 text-muted small fw-bold">Filtrar por Categoria:</p>
                 <div class="btn-group mb-3 w-100 shadow-sm">
                     <button class="btn btn-light border" onclick="filtrarCategoria('TODOS', this)">Geral</button>
                     <button class="btn btn-light border text-primary" onclick="filtrarCategoria('VENDA', this)">Vendas</button>
@@ -208,14 +209,60 @@
 
             <div id="page-clientes" class="page-section d-none">
                 <div class="card card-custom p-4 mb-3">
-                    <h5 class="mb-3">Novo Cliente</h5>
-                    <div class="input-group">
-                        <input type="text" id="cliNome" class="form-control" placeholder="Nome Completo">
-                        <input type="text" id="cliDoc" class="form-control" placeholder="CPF/CNPJ">
-                        <button onclick="salvarCliente()" class="btn btn-primary">Salvar</button>
+                    <h5 class="mb-3 text-primary"><i class="fas fa-user-plus"></i> Novo Cliente</h5>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="small text-muted fw-bold">CEP (Busca Auto)</label>
+                            <input type="text" id="cliCep" class="form-control" placeholder="00000-000" onblur="buscarCep()">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small text-muted fw-bold">Rua / Logradouro</label>
+                            <input type="text" id="cliRua" class="form-control" readonly>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="small text-muted fw-bold">Número</label>
+                            <input type="text" id="cliNum" class="form-control">
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label class="small text-muted fw-bold">Bairro</label>
+                            <input type="text" id="cliBairro" class="form-control" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="small text-muted fw-bold">Cidade</label>
+                            <input type="text" id="cliCidade" class="form-control" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="small text-muted fw-bold">Estado (UF)</label>
+                            <input type="text" id="cliUf" class="form-control" readonly>
+                        </div>
+
+                        <div class="col-md-5">
+                            <label class="small text-muted fw-bold">Nome Completo</label>
+                            <input type="text" id="cliNome" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="small text-muted fw-bold">Telefone/Zap</label>
+                            <input type="text" id="cliTel" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="small text-muted fw-bold">CPF/CNPJ</label>
+                            <input type="text" id="cliDoc" class="form-control">
+                        </div>
+                        
+                        <div class="col-12 text-end">
+                            <button onclick="salvarCliente()" class="btn btn-success px-4">Cadastrar Cliente</button>
+                        </div>
                     </div>
                 </div>
-                <ul id="listaClientes" class="list-group shadow-sm"></ul>
+                
+                <div class="card card-custom table-responsive">
+                    <h6 class="p-3 border-bottom">Lista de Clientes</h6>
+                    <table class="table table-hover m-0">
+                        <thead class="table-light"><tr><th>Nome</th><th>Telefone</th><th>Cidade/UF</th><th>Ação</th></tr></thead>
+                        <tbody id="listaClientes"></tbody>
+                    </table>
+                </div>
             </div>
 
         </div>
@@ -225,17 +272,17 @@
 <script>
     // --- BANCO DE DADOS ---
     const DB = {
-        clientes: JSON.parse(localStorage.getItem('k14_clientes')) || [],
-        produtos: JSON.parse(localStorage.getItem('k14_produtos')) || [],
-        contratos: JSON.parse(localStorage.getItem('k14_contratos')) || [],
-        faturas: JSON.parse(localStorage.getItem('k14_faturas')) || []
+        clientes: JSON.parse(localStorage.getItem('k15_clientes')) || [],
+        produtos: JSON.parse(localStorage.getItem('k15_produtos')) || [],
+        contratos: JSON.parse(localStorage.getItem('k15_contratos')) || [],
+        faturas: JSON.parse(localStorage.getItem('k15_faturas')) || []
     };
 
     function saveDB() {
-        localStorage.setItem('k14_clientes', JSON.stringify(DB.clientes));
-        localStorage.setItem('k14_produtos', JSON.stringify(DB.produtos));
-        localStorage.setItem('k14_contratos', JSON.stringify(DB.contratos));
-        localStorage.setItem('k14_faturas', JSON.stringify(DB.faturas));
+        localStorage.setItem('k15_clientes', JSON.stringify(DB.clientes));
+        localStorage.setItem('k15_produtos', JSON.stringify(DB.produtos));
+        localStorage.setItem('k15_contratos', JSON.stringify(DB.contratos));
+        localStorage.setItem('k15_faturas', JSON.stringify(DB.faturas));
     }
 
     // --- LOGIN ---
@@ -264,7 +311,7 @@
         if(page === 'financeiro') { filtroCat = 'TODOS'; renderFinanceiro(); }
     }
 
-    // --- CADASTROS ---
+    // --- CADASTRO PRODUTOS ---
     function salvarProduto() {
         DB.produtos.push({
             id: Date.now(),
@@ -288,31 +335,73 @@
             const corMargem = margem < 30 ? 'text-danger' : 'text-success';
             
             tb.innerHTML += `<tr>
-                <td>${p.nome}</td>
-                <td>R$ ${p.custo.toFixed(2)}</td>
-                <td>R$ ${p.venda.toFixed(2)}</td>
-                <td class="${corMargem} fw-bold">${margem}%</td>
-                <td>${p.qtd}</td>
+                <td>${p.nome}</td><td>R$ ${p.custo}</td><td>R$ ${p.venda}</td>
+                <td class="${corMargem} fw-bold">${margem}%</td><td>${p.qtd}</td>
             </tr>`;
             sel.innerHTML += `<option value="${p.id}">${p.nome}</option>`;
         });
     }
 
+    // --- CADASTRO CLIENTES (NOVO COM CEP) ---
+    async function buscarCep() {
+        let cep = document.getElementById('cliCep').value.replace(/\D/g, '');
+        if(cep.length !== 8) return;
+        
+        try {
+            document.getElementById('cliRua').value = "Buscando...";
+            const resp = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+            const data = await resp.json();
+            
+            if(!data.erro) {
+                document.getElementById('cliRua').value = data.logradouro;
+                document.getElementById('cliBairro').value = data.bairro;
+                document.getElementById('cliCidade').value = data.localidade;
+                document.getElementById('cliUf').value = data.uf;
+                document.getElementById('cliNum').focus(); // Pula pro número
+            } else {
+                alert("CEP não encontrado!");
+                document.getElementById('cliRua').value = "";
+            }
+        } catch(e) { alert("Erro ao buscar CEP"); }
+    }
+
     function salvarCliente() {
-        DB.clientes.push({
+        const cli = {
             id: Date.now(),
             nome: document.getElementById('cliNome').value,
-            doc: document.getElementById('cliDoc').value
-        });
-        saveDB(); renderClientes(); alert('Cliente Salvo!');
+            tel: document.getElementById('cliTel').value,
+            doc: document.getElementById('cliDoc').value,
+            cep: document.getElementById('cliCep').value,
+            rua: document.getElementById('cliRua').value,
+            num: document.getElementById('cliNum').value,
+            bairro: document.getElementById('cliBairro').value,
+            cidade: document.getElementById('cliCidade').value,
+            uf: document.getElementById('cliUf').value
+        };
+
+        if(!cli.nome) return alert("Preencha o Nome!");
+
+        DB.clientes.push(cli);
+        saveDB(); 
+        renderClientes(); 
+        alert('Cliente Cadastrado com Sucesso!');
+        
+        // Limpar campos
+        document.querySelectorAll('#page-clientes input').forEach(i => i.value = '');
     }
 
     function renderClientes() {
-        const ul = document.getElementById('listaClientes');
+        const tb = document.getElementById('listaClientes');
         const sel = document.getElementById('selCliente');
-        ul.innerHTML = ''; sel.innerHTML = '<option value="">Selecione...</option>';
+        tb.innerHTML = ''; sel.innerHTML = '<option value="">Selecione...</option>';
+        
         DB.clientes.forEach(c => {
-            ul.innerHTML += `<li class="list-group-item">${c.nome} <small class="text-muted">(${c.doc})</small></li>`;
+            tb.innerHTML += `<tr>
+                <td>${c.nome}</td>
+                <td>${c.tel || '-'}</td>
+                <td>${c.cidade}/${c.uf}</td>
+                <td><button class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></button></td>
+            </tr>`;
             sel.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
         });
     }
@@ -358,7 +447,6 @@
         
         const tipo = document.getElementById('tipoContrato').value;
         const valMensal = parseFloat(document.getElementById('valorMensal').value) || 0;
-        
         const custoItens = carrinho.reduce((a,b) => a + (b.custo*b.qtdCarrinho), 0);
         const vendaItens = carrinho.reduce((a,b) => a + (b.venda*b.qtdCarrinho), 0);
         
@@ -387,20 +475,17 @@
             DB.contratos.push(contrato);
         }
 
-        saveDB(); alert('Pedido Salvo!'); carrinho=[]; renderEstoque(); nav('dashboard');
+        saveDB(); alert('Salvo!'); carrinho=[]; renderEstoque(); nav('dashboard');
         gerarPDF(contrato);
     }
 
-    // --- FINANCEIRO (FILTROS NOVOS) ---
+    // --- FINANCEIRO (FILTROS) ---
     let filtroCat = 'TODOS';
-
     function filtrarCategoria(cat, btn) {
         filtroCat = cat;
-        // Atualiza visual dos botões
         const botoes = btn.parentElement.querySelectorAll('button');
         botoes.forEach(b => b.classList.remove('active', 'fw-bold'));
         btn.classList.add('active', 'fw-bold');
-        
         renderFinanceiro();
     }
 
@@ -434,13 +519,11 @@
         const tb = document.getElementById('listaFaturas');
         tb.innerHTML = '';
         DB.faturas.forEach(f => {
-            // Filtro por Categoria (Texto na descrição)
             if(filtroCat !== 'TODOS') {
                 if(filtroCat === 'VENDA' && !f.descricao.toUpperCase().includes('VENDA')) return;
                 if(filtroCat === 'ALUGUEL' && !f.descricao.toUpperCase().includes('ALUGUEL')) return;
                 if(filtroCat === 'STREAMING' && !f.descricao.toUpperCase().includes('STREAMING')) return;
             }
-
             const cli = DB.clientes.find(c => c.id === f.clienteId);
             const btn = f.status === 'ABERTO' 
                 ? `<button onclick="darBaixa(${f.id})" class="btn btn-sm btn-outline-success">RECEBER</button>` 
@@ -480,10 +563,11 @@
 
         doc.setTextColor(0,0,0);
         doc.text(`Cliente: ${cli.nome}`, 14, 50);
-        doc.text(`Tipo: ${p.tipo}`, 14, 56);
+        doc.text(`Endereço: ${cli.rua}, ${cli.num} - ${cli.bairro}`, 14, 56);
+        doc.text(`Cidade: ${cli.cidade}/${cli.uf} | Tel: ${cli.tel}`, 14, 62);
         
         const rows = p.itens.map(i => [i.nome, i.qtdCarrinho]);
-        doc.autoTable({ startY: 65, head: [['Item','Qtd']], body: rows });
+        doc.autoTable({ startY: 70, head: [['Item','Qtd']], body: rows });
         
         const finalY = doc.lastAutoTable.finalY + 10;
         doc.setFontSize(14);
