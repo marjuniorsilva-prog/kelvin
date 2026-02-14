@@ -3,248 +3,282 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.S SERVIÇO | Gestão Profissional</title>
+    <title>K.S SERVIÇO | Sistema Integrado</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         :root {
-            --primary: #0f172a; /* Azul Escuro */
+            --primary: #0f172a; /* Azul Noite */
             --secondary: #1e293b; /* Cinza Painel */
-            --accent: #ffc107; /* Amarelo Ouro */
-            --text: #e2e8f0;
+            --accent: #d4af37; /* Dourado */
+            --text: #f8fafc;
             --success: #22c55e;
             --danger: #ef4444;
             --border: #334155;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; font-family: 'Roboto', sans-serif; }
-        
-        body { background: var(--primary); color: var(--text); height: 100vh; display: flex; overflow: hidden; }
+        body { background: var(--primary); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
 
         /* MENU LATERAL */
         aside {
-            width: 250px; background: var(--secondary); border-right: 1px solid var(--border);
-            display: flex; flex-direction: column;
+            width: 260px; background: var(--secondary); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; padding-top: 20px;
         }
-        .brand { padding: 20px; font-size: 1.2rem; font-weight: bold; color: var(--accent); border-bottom: 1px solid var(--border); }
-        .menu-btn {
-            padding: 15px 20px; background: none; border: none; color: #94a3b8;
-            text-align: left; cursor: pointer; display: flex; align-items: center; gap: 10px;
-            transition: 0.3s; font-size: 1rem;
+        .brand { 
+            text-align: center; color: var(--accent); font-size: 1.4rem; font-weight: bold; 
+            margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 20px;
         }
-        .menu-btn:hover, .menu-btn.active { background: rgba(255, 193, 7, 0.1); color: var(--accent); border-left: 4px solid var(--accent); }
+        .menu-item {
+            padding: 15px 25px; cursor: pointer; color: #94a3b8; transition: 0.3s;
+            display: flex; align-items: center; gap: 10px; font-weight: 500;
+        }
+        .menu-item:hover, .menu-item.active { 
+            background: rgba(212, 175, 55, 0.1); color: var(--accent); border-right: 4px solid var(--accent); 
+        }
 
-        /* ÁREA PRINCIPAL */
-        main { flex: 1; padding: 20px; overflow-y: auto; background: #0f172a; }
+        /* CONTEÚDO PRINCIPAL */
+        main { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
+        .section { display: none; animation: fadeIn 0.3s; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        h2 { color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 20px; }
         
-        .panel { background: var(--secondary); padding: 20px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px; }
-        h2 { border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 20px; color: var(--accent); font-size: 1.1rem; text-transform: uppercase; }
-
-        /* INPUTS E BOTÕES */
+        .panel { background: var(--secondary); padding: 25px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 25px; }
+        
+        /* FORMULÁRIOS */
         .row { display: flex; gap: 15px; margin-bottom: 15px; }
         .col { flex: 1; }
-        
         label { display: block; margin-bottom: 5px; font-size: 0.85rem; color: #94a3b8; }
-        input, select {
-            width: 100%; padding: 10px; background: #020617; border: 1px solid var(--border);
-            color: white; border-radius: 5px;
+        input, select, textarea {
+            width: 100%; padding: 12px; background: #020617; border: 1px solid var(--border);
+            color: white; border-radius: 6px; font-size: 1rem;
         }
         input:focus { border-color: var(--accent); }
 
-        button { padding: 10px 20px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; }
-        .btn-add { background: var(--accent); color: #000; }
-        .btn-success { background: var(--success); color: white; width: 100%; padding: 15px; font-size: 1.1rem; }
-        .btn-danger { background: var(--danger); color: white; }
+        /* BOTÕES */
+        button { padding: 12px 20px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-gold { background: var(--accent); color: #000; width: 100%; }
+        .btn-gold:hover { background: #b5952f; }
+        .btn-green { background: var(--success); color: white; }
+        .btn-red { background: var(--danger); color: white; }
+        .btn-blue { background: #3b82f6; color: white; }
 
         /* TABELAS */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
         th { color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; }
-        tr:hover { background: rgba(255,255,255,0.05); }
 
-        /* TABELA DE CARRINHO (O Pulo do Gato) */
-        .cart-table { background: rgba(0,0,0,0.2); border-radius: 5px; }
-        .cart-total { text-align: right; font-size: 1.5rem; font-weight: bold; padding: 20px; color: var(--success); }
-
+        /* ÁREA DE IMPRESSÃO DO PDF (Escondida na tela normal) */
+        #pdf-template {
+            display: none; /* Só aparece quando gera PDF */
+            background: white; color: black; padding: 40px;
+            font-family: 'Arial', sans-serif;
+        }
+        #pdf-template h1 { color: #0f172a; margin-bottom: 5px; }
+        #pdf-template table { border: 1px solid #ddd; margin-top: 20px; width: 100%; }
+        #pdf-template th { background: #eee; color: black; border: 1px solid #ddd; }
+        #pdf-template td { border: 1px solid #ddd; color: black; }
+        
         /* LOGIN */
-        #login-screen {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 999;
+        #login-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999;
             display: flex; justify-content: center; align-items: center;
         }
-        .login-box { background: var(--secondary); padding: 40px; border-radius: 10px; border: 1px solid var(--accent); text-align: center; }
+        .login-box { background: var(--secondary); padding: 40px; border-radius: 15px; border: 1px solid var(--accent); text-align: center; }
 
-        /* MODAIS */
-        .section { display: none; }
-        .section.active { display: block; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
+    <div id="login-overlay">
         <div class="login-box">
             <h1 style="color:var(--accent); margin-bottom:10px">K.S SERVIÇO</h1>
-            <p style="color:#aaa; margin-bottom:20px">Sistema de Gestão de Segurança</p>
-            <button class="btn-add" onclick="loginGoogle()"><i class="fab fa-google"></i> ENTRAR NO SISTEMA</button>
+            <p style="color:#cbd5e1; margin-bottom:20px">Sistema Administrativo</p>
+            <button class="btn-gold" onclick="fazerLoginGoogle()"><i class="fab fa-google"></i> Acessar com Google</button>
         </div>
     </div>
 
     <aside>
-        <div class="brand"><i class="fa-solid fa-camera"></i> K.S SERVIÇO</div>
-        <button class="menu-btn active" onclick="show('novo-pedido')"><i class="fa-solid fa-cart-plus"></i> Novo Pedido (Kit)</button>
-        <button class="menu-btn" onclick="show('estoque')"><i class="fa-solid fa-boxes-stacked"></i> Ver Estoque</button>
-        <button class="menu-btn" onclick="show('financeiro')"><i class="fa-solid fa-sack-dollar"></i> Financeiro & Gastos</button>
-        <button class="menu-btn" onclick="show('historico')"><i class="fa-solid fa-clock-rotate-left"></i> Histórico Pedidos</button>
-        <div style="margin-top:auto; padding:20px; font-size:0.8rem; color:#64748b;">
-            Logado como: <span id="user-name">...</span><br>
-            <span style="color:var(--danger); cursor:pointer" onclick="logout()">Sair</span>
+        <div class="brand"><i class="fa-solid fa-shield-halved"></i> K.S SERVIÇO</div>
+        <div class="menu-item active" onclick="nav('orcamentos')"><i class="fa-solid fa-file-invoice"></i> Orçamentos / OS</div>
+        <div class="menu-item" onclick="nav('estoque')"><i class="fa-solid fa-boxes-stacked"></i> Estoque Inteligente</div>
+        <div class="menu-item" onclick="nav('despesas')"><i class="fa-solid fa-money-bill-transfer"></i> Lançar Despesas</div>
+        <div class="menu-item" onclick="nav('financeiro')"><i class="fa-solid fa-chart-pie"></i> Relatórios Financeiros</div>
+        
+        <div style="margin-top:auto; padding:20px; font-size:0.8rem; color:#64748b; text-align:center;">
+            Logado: <span id="user-display">...</span><br>
+            <a href="#" onclick="sair()" style="color:var(--danger)">Sair</a>
         </div>
     </aside>
 
     <main>
-        
-        <div id="novo-pedido" class="section active">
+
+        <div id="orcamentos" class="section active">
             <div class="panel">
-                <h2>1. Dados do Cliente e Tipo</h2>
+                <h2>1. Dados do Cliente (Orçamento)</h2>
                 <div class="row">
-                    <div class="col">
-                        <label>Nome do Cliente / Obra</label>
-                        <input type="text" id="ped-cliente" placeholder="Ex: Mercado Central">
-                    </div>
-                    <div class="col">
-                        <label>Tipo de Contrato</label>
-                        <select id="ped-tipo">
-                            <option value="venda">Venda Definitiva (Instalação)</option>
-                            <option value="aluguel">Aluguel (Mensalidade)</option>
-                        </select>
-                    </div>
+                    <div class="col"><label>Nome do Cliente</label><input type="text" id="cli-nome"></div>
+                    <div class="col"><label>CPF / CNPJ</label><input type="text" id="cli-doc"></div>
+                </div>
+                <div class="row">
+                    <div class="col"><label>Endereço Completo</label><input type="text" id="cli-end"></div>
+                    <div class="col"><label>Data do Orçamento</label><input type="date" id="cli-data"></div>
                 </div>
             </div>
 
             <div class="panel">
-                <h2>2. Montar Kit (Adicionar Item por Item)</h2>
+                <h2>2. Itens do Pedido</h2>
                 <div class="row" style="align-items: flex-end;">
-                    <div class="col" style="flex: 3;">
-                        <label>Selecione o Produto do Estoque</label>
-                        <select id="ped-produto">
-                            <option value="">Carregando estoque...</option>
-                        </select>
+                    <div class="col" style="flex:2;">
+                        <label>Buscar Produto (Estoque)</label>
+                        <select id="cart-prod-select"><option>Carregando...</option></select>
                     </div>
-                    <div class="col">
-                        <label>Qtd / Metros</label>
-                        <input type="number" id="ped-qtd" value="1">
-                    </div>
-                    <button class="btn-add" onclick="adicionarAoCarrinho()"><i class="fa-solid fa-plus"></i> INCLUIR</button>
+                    <div class="col"><label>Qtd</label><input type="number" id="cart-qtd" value="1"></div>
+                    <button class="btn-gold" style="width:auto;" onclick="addCarrinho()">+ Adicionar</button>
                 </div>
-                
-                <table class="cart-table">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Qtd</th>
-                            <th>Valor Unit.</th>
-                            <th>Subtotal</th>
-                            <th>Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody id="lista-carrinho">
-                        </tbody>
+                <table>
+                    <thead><tr><th>Item</th><th>Qtd</th><th>Unit. (R$)</th><th>Total (R$)</th><th>Ação</th></tr></thead>
+                    <tbody id="cart-body"></tbody>
                 </table>
-                <div class="cart-total" id="total-carrinho">Total: R$ 0,00</div>
+                <div style="text-align:right; font-size:1.5rem; margin-top:20px; color:var(--success); font-weight:bold;" id="cart-total">Total: R$ 0,00</div>
             </div>
 
             <div class="panel">
-                <h2>3. Finalizar</h2>
+                <h2>3. Finalização</h2>
                 <div class="row">
-                    <div class="col">
-                        <label>Valor da Mão de Obra / Instalação (R$)</label>
-                        <input type="number" id="ped-mao-obra" placeholder="0,00">
-                    </div>
-                    <div class="col">
-                        <label>Data de Instalação / Cobrança</label>
-                        <input type="date" id="ped-data">
+                    <div class="col"><label>Mão de Obra / Instalação (R$)</label><input type="number" id="cli-servico" value="0" onchange="atualizarTotalVisual()"></div>
+                    <div class="col"><label>Status Inicial</label>
+                        <input type="text" value="Aguardando Aprovação" disabled style="color:#aaa">
                     </div>
                 </div>
-                <button class="btn-success" onclick="fecharPedido()"><i class="fa-solid fa-check"></i> GERAR ORDEM DE SERVIÇO E BAIXAR ESTOQUE</button>
+                <div class="row">
+                    <button class="btn-blue col" onclick="gerarPDFOrçamento()"><i class="fa-solid fa-file-pdf"></i> GERAR PDF ORÇAMENTO</button>
+                    <button class="btn-green col" onclick="fecharVenda()"><i class="fa-solid fa-check-circle"></i> APROVAR VENDA (BAIXAR ESTOQUE)</button>
+                </div>
             </div>
         </div>
 
         <div id="estoque" class="section">
             <div class="panel">
-                <h2>Cadastrar Novo Produto (Compra)</h2>
+                <h2>Entrada de Estoque / Cadastro</h2>
+                <p style="color:#94a3b8; font-size:0.9rem; margin-bottom:15px;">Se o nome for igual a um existente, o sistema irá <strong>SOMAR</strong> a quantidade automaticamente.</p>
                 <div class="row">
-                    <div class="col"><label>Nome Produto</label><input type="text" id="cad-nome"></div>
-                    <div class="col"><label>Custo (R$)</label><input type="number" id="cad-custo"></div>
-                    <div class="col"><label>Venda (R$)</label><input type="number" id="cad-venda"></div>
-                    <div class="col"><label>Aluguel (R$)</label><input type="number" id="cad-aluguel"></div>
-                    <div class="col"><label>Qtd Inicial</label><input type="number" id="cad-qtd"></div>
+                    <div class="col"><label>Nome do Produto</label><input type="text" id="est-nome" list="lista-produtos-existentes"></div>
+                    <div class="col"><label>Custo Compra (R$)</label><input type="number" id="est-custo"></div>
+                    <div class="col"><label>Preço Venda (R$)</label><input type="number" id="est-venda"></div>
+                    <div class="col"><label>Qtd Entrada</label><input type="number" id="est-qtd"></div>
                 </div>
-                <button class="btn-add" style="width:100%" onclick="salvarProduto()">SALVAR NO ESTOQUE</button>
+                <button class="btn-gold" onclick="salvarEstoque()">LANÇAR NO ESTOQUE</button>
+                
+                <datalist id="lista-produtos-existentes"></datalist>
             </div>
-
+            
             <div class="panel">
-                <h2>Meu Estoque Atual</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Produto</th>
-                            <th>Qtd Disponível</th>
-                            <th>Custo Médio</th>
-                            <th>Preço Venda</th>
-                            <th>Preço Aluguel</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabela-estoque-visual"></tbody>
-                </table>
+                <h2>Estoque Atual</h2>
+                <table id="tabela-estoque"></table>
             </div>
         </div>
 
-        <div id="financeiro" class="section">
-            <div class="panel" style="border-color: var(--danger);">
-                <h2 style="color:var(--danger)">Lançar Despesa (Não Estoque)</h2>
-                <p style="color:#94a3b8; margin-bottom:15px">Ex: Gasolina, Almoço, Ferramenta, Propaganda.</p>
+        <div id="despesas" class="section">
+            <div class="panel" style="border-left: 5px solid var(--danger);">
+                <h2 style="color:var(--danger)">Lançar Despesa Operacional</h2>
                 <div class="row">
-                    <div class="col"><label>Descrição do Gasto</label><input type="text" id="gasto-desc"></div>
-                    <div class="col"><label>Valor (R$)</label><input type="number" id="gasto-valor"></div>
-                    <div class="col"><label>Data</label><input type="date" id="gasto-data"></div>
-                    <button class="btn-danger" onclick="lancarDespesa()">REGISTRAR SAÍDA</button>
+                    <div class="col"><label>Descrição (Ex: Gasolina, Almoço)</label><input type="text" id="desp-desc"></div>
+                    <div class="col"><label>Valor (R$)</label><input type="number" id="desp-valor"></div>
+                    <div class="col"><label>Data</label><input type="date" id="desp-data"></div>
                 </div>
+                <button class="btn-red" onclick="lancarDespesa()">REGISTRAR SAÍDA</button>
             </div>
-
             <div class="panel">
-                <h2>Resumo Financeiro</h2>
-                <div class="row">
-                    <div class="col panel" style="background:#14532d; text-align:center;">
-                        <label style="color:white">Total Entradas (Vendas + Serviços)</label>
-                        <h1 id="fin-entradas">R$ 0,00</h1>
-                    </div>
-                    <div class="col panel" style="background:#7f1d1d; text-align:center;">
-                        <label style="color:white">Total Saídas (Compras + Despesas)</label>
-                        <h1 id="fin-saidas">R$ 0,00</h1>
-                    </div>
-                    <div class="col panel" style="background:#0f172a; border:1px solid var(--accent); text-align:center;">
-                        <label style="color:var(--accent)">Lucro Líquido</label>
-                        <h1 id="fin-lucro">R$ 0,00</h1>
-                    </div>
-                </div>
-                <h3>Últimas Despesas</h3>
+                <h3>Últimas Despesas Lançadas</h3>
                 <table id="tabela-despesas"></table>
             </div>
         </div>
 
-        <div id="historico" class="section">
+        <div id="financeiro" class="section">
             <div class="panel">
-                <h2>Histórico de Contratos / Pedidos</h2>
-                <table id="tabela-historico"></table>
+                <h2>Relatório Financeiro Detalhado</h2>
+                <div class="row" style="align-items: flex-end;">
+                    <div class="col"><label>Data Início</label><input type="date" id="filtro-inicio"></div>
+                    <div class="col"><label>Data Fim</label><input type="date" id="filtro-fim"></div>
+                    <button class="btn-gold col" onclick="filtrarFinanceiro()">FILTRAR PERÍODO</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col panel" style="text-align:center; border-color:var(--success)">
+                    <h3 style="color:var(--success)">Faturamento Bruto</h3>
+                    <p style="font-size:2rem; font-weight:bold" id="kpi-faturamento">R$ 0,00</p>
+                    <small>Vendas + Serviços</small>
+                </div>
+                <div class="col panel" style="text-align:center; border-color:var(--danger)">
+                    <h3 style="color:var(--danger)">Total Saídas</h3>
+                    <p style="font-size:2rem; font-weight:bold" id="kpi-saidas">R$ 0,00</p>
+                    <small>Despesas + Custo Produtos Vendidos</small>
+                </div>
+                <div class="col panel" style="text-align:center; border-color:var(--accent)">
+                    <h3 style="color:var(--accent)">Lucro Líquido</h3>
+                    <p style="font-size:2rem; font-weight:bold" id="kpi-lucro">R$ 0,00</p>
+                    <small>Real no Bolso</small>
+                </div>
             </div>
         </div>
 
     </main>
 
+    <div id="pdf-template">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid #333; padding-bottom:10px;">
+            <div>
+                <h1 style="margin:0;">K.S SERVIÇO</h1>
+                <p>Segurança Eletrônica & Monitoramento</p>
+                <p style="font-size:0.8rem">CNPJ: 52.975.677/0001-49 | Jardinópolis - SP</p>
+            </div>
+            <div style="text-align:right;">
+                <h2 style="color:black; margin:0;">ORÇAMENTO / OS</h2>
+                <p id="pdf-os-num" style="font-weight:bold; font-size:1.2rem; color:red;">#0000</p>
+                <p id="pdf-data">Data: --/--/----</p>
+            </div>
+        </div>
+
+        <div style="margin-top:20px; background:#f9f9f9; padding:15px; border-radius:5px;">
+            <p><strong>Cliente:</strong> <span id="pdf-cliente"></span></p>
+            <p><strong>CPF/CNPJ:</strong> <span id="pdf-doc"></span></p>
+            <p><strong>Endereço:</strong> <span id="pdf-end"></span></p>
+        </div>
+
+        <table style="width:100%; border-collapse:collapse; margin-top:20px;">
+            <thead>
+                <tr style="background:#333; color:white;">
+                    <th style="padding:10px;">Descrição</th>
+                    <th style="padding:10px;">Qtd</th>
+                    <th style="padding:10px;">Valor Unit.</th>
+                    <th style="padding:10px;">Total</th>
+                </tr>
+            </thead>
+            <tbody id="pdf-itens">
+                </tbody>
+        </table>
+
+        <div style="text-align:right; margin-top:20px;">
+            <p>Total Produtos: R$ <span id="pdf-total-prod">0,00</span></p>
+            <p>Mão de Obra: R$ <span id="pdf-total-serv">0,00</span></p>
+            <h3 style="background:#ddd; display:inline-block; padding:10px;">TOTAL GERAL: R$ <span id="pdf-total-geral">0,00</span></h3>
+        </div>
+
+        <div style="margin-top:50px; border-top:1px solid #000; width:40%; text-align:center; padding-top:10px;">
+            Assinatura do Cliente
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, increment, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, increment, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBbs5adc-5M46SujfgPpOYOHTjsncxce_8",
@@ -258,231 +292,224 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        let carrinho = [];
+        let estoqueCache = {};
 
-        // --- VARIÁVEIS GLOBAIS ---
-        let carrinho = []; // A lista temporária de itens do pedido
-        let estoqueCache = {}; // Para guardar dados do produto (preço, nome)
-
-        // --- SISTEMA DE ABAS ---
-        window.show = (id) => {
-            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+        // NAVEGAÇÃO
+        window.nav = (id) => {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            document.querySelectorAll('.menu-btn').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
             event.currentTarget.classList.add('active');
         };
 
-        // --- AUTH ---
-        window.loginGoogle = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(alert);
-        window.logout = () => signOut(auth).then(() => location.reload());
+        // LOGIN
+        window.fazerLoginGoogle = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(alert);
+        window.sair = () => signOut(auth).then(() => location.reload());
         
-        onAuthStateChanged(auth, user => {
-            if(user && ['kelvinedu723@gmail.com', 'mar.junior.silva@gmail.com'].includes(user.email)) {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('user-name').innerText = user.displayName;
+        onAuthStateChanged(auth, u => {
+            if(u && ['kelvinedu723@gmail.com', 'mar.junior.silva@gmail.com'].includes(u.email)){
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('user-display').innerText = u.displayName.split(' ')[0];
                 iniciarApp();
             }
         });
 
-        // --- APP LOGIC ---
         function iniciarApp() {
-            
-            // 1. CARREGAR ESTOQUE EM TEMPO REAL
+            // 1. CARREGAR ESTOQUE (AUTOCOMPLETE E SELECT)
             onSnapshot(collection(db, "estoque"), (snap) => {
-                const select = document.getElementById('ped-produto');
-                const tabela = document.getElementById('tabela-estoque-visual');
+                const sel = document.getElementById('cart-prod-select');
+                const list = document.getElementById('lista-produtos-existentes');
+                const tb = document.getElementById('tabela-estoque');
                 
-                select.innerHTML = '<option value="">Selecione o Produto...</option>';
-                tabela.innerHTML = '';
+                sel.innerHTML = '<option value="">Selecione...</option>';
+                list.innerHTML = '';
+                tb.innerHTML = '<thead><tr><th>Produto</th><th>Custo</th><th>Venda</th><th>Estoque</th></tr></thead><tbody>';
 
-                snap.forEach(doc => {
-                    const prod = doc.data();
-                    estoqueCache[doc.id] = prod; // Guarda na memória
+                snap.forEach(d => {
+                    const p = d.data();
+                    estoqueCache[d.id] = p; // Cache para usar no carrinho
                     
-                    // Preenche Select de Pedido
-                    if(prod.qtd > 0) {
-                        select.innerHTML += `<option value="${doc.id}">${prod.nome} (Disp: ${prod.qtd})</option>`;
-                    }
+                    // Select do Orçamento
+                    if(p.qtd > 0) sel.innerHTML += `<option value="${d.id}">${p.nome} (R$ ${p.venda})</option>`;
+                    
+                    // Datalist do Cadastro (Para somar)
+                    list.innerHTML += `<option value="${p.nome}">`;
 
-                    // Preenche Tabela Visual de Estoque
-                    tabela.innerHTML += `
-                        <tr>
-                            <td>${prod.nome}</td>
-                            <td style="color:${prod.qtd < 5 ? 'red' : 'lightgreen'}">${prod.qtd}</td>
-                            <td>R$ ${prod.custo}</td>
-                            <td>R$ ${prod.venda}</td>
-                            <td>R$ ${prod.aluguel}</td>
-                        </tr>
-                    `;
+                    // Tabela Estoque
+                    tb.innerHTML += `<tr><td>${p.nome}</td><td>R$ ${p.custo}</td><td>R$ ${p.venda}</td><td>${p.qtd}</td></tr>`;
                 });
             });
 
-            // 2. ADICIONAR AO CARRINHO (Lógica Nova)
-            window.adicionarAoCarrinho = () => {
-                const idProd = document.getElementById('ped-produto').value;
-                const qtd = Number(document.getElementById('ped-qtd').value);
-                const tipoPedido = document.getElementById('ped-tipo').value;
-
-                if(!idProd || qtd <= 0) return alert("Selecione produto e quantidade.");
+            // 2. ORÇAMENTO & CARRINHO
+            window.addCarrinho = () => {
+                const id = document.getElementById('cart-prod-select').value;
+                const qtd = Number(document.getElementById('cart-qtd').value);
                 
-                const prod = estoqueCache[idProd];
+                if(!id || qtd <= 0) return alert("Selecione produto e quantidade.");
+                const prod = estoqueCache[id];
                 if(qtd > prod.qtd) return alert(`Estoque insuficiente! Só tem ${prod.qtd}.`);
 
-                // Define preço baseado se é venda ou aluguel
-                const precoUnit = tipoPedido === 'venda' ? prod.venda : prod.aluguel;
-
-                // Adiciona na lista temporária
-                carrinho.push({
-                    id: idProd,
-                    nome: prod.nome,
-                    qtd: qtd,
-                    unitario: precoUnit,
-                    total: precoUnit * qtd
-                });
-
-                atualizarTabelaCarrinho();
+                carrinho.push({ id: id, nome: prod.nome, custo: prod.custo, venda: prod.venda, qtd: qtd, total: prod.venda * qtd });
+                renderCarrinho();
             };
 
-            function atualizarTabelaCarrinho() {
-                const tbody = document.getElementById('lista-carrinho');
+            function renderCarrinho() {
+                const tbody = document.getElementById('cart-body');
                 tbody.innerHTML = '';
-                let totalGeral = 0;
-
-                carrinho.forEach((item, index) => {
-                    totalGeral += item.total;
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${item.nome}</td>
-                            <td>${item.qtd}</td>
-                            <td>R$ ${item.unitario.toFixed(2)}</td>
-                            <td>R$ ${item.total.toFixed(2)}</td>
-                            <td><button style="background:red; padding:5px" onclick="removerItem(${index})">X</button></td>
-                        </tr>
-                    `;
+                let total = 0;
+                carrinho.forEach((item, i) => {
+                    total += item.total;
+                    tbody.innerHTML += `<tr><td>${item.nome}</td><td>${item.qtd}</td><td>R$ ${item.venda}</td><td>R$ ${item.total}</td><td><button onclick="carrinho.splice(${i},1);renderCarrinho()" style="background:red;padding:5px">X</button></td></tr>`;
                 });
-
-                document.getElementById('total-carrinho').innerText = "Total Itens: R$ " + totalGeral.toFixed(2);
+                document.getElementById('cart-total').innerText = "Total Prod: R$ " + total.toFixed(2);
+                window.totalProdutos = total;
+                atualizarTotalVisual();
             }
 
-            window.removerItem = (index) => {
-                carrinho.splice(index, 1);
-                atualizarTabelaCarrinho();
+            window.atualizarTotalVisual = () => {
+                const serv = Number(document.getElementById('cli-servico').value) || 0;
+                const tot = (window.totalProdutos || 0) + serv;
+                document.getElementById('cart-total').innerText = "Total Geral: R$ " + tot.toFixed(2);
             };
 
-            // 3. FECHAR PEDIDO (Salvar no Banco e Baixar Estoque)
-            window.fecharPedido = async () => {
-                if(carrinho.length === 0) return alert("Carrinho vazio!");
-                const cliente = document.getElementById('ped-cliente').value;
-                if(!cliente) return alert("Digite o nome do cliente!");
+            // 3. GERAR PDF
+            window.gerarPDFOrçamento = () => {
+                if(carrinho.length === 0) return alert("Adicione itens ao orçamento.");
+                
+                // Preencher o template oculto
+                const osNum = "OS-" + Date.now().toString().slice(-6); // Gera numero aleatorio curto
+                document.getElementById('pdf-os-num').innerText = osNum;
+                document.getElementById('pdf-data').innerText = document.getElementById('cli-data').value || new Date().toLocaleDateString();
+                document.getElementById('pdf-cliente').innerText = document.getElementById('cli-nome').value;
+                document.getElementById('pdf-doc').innerText = document.getElementById('cli-doc').value;
+                document.getElementById('pdf-end').innerText = document.getElementById('cli-end').value;
 
-                const maoObra = Number(document.getElementById('ped-mao-obra').value);
-                const data = document.getElementById('ped-data').value;
-                const tipo = document.getElementById('ped-tipo').value;
-
-                // 1. Salvar o Contrato/Pedido
-                await addDoc(collection(db, "pedidos"), {
-                    cliente: cliente,
-                    tipo: tipo,
-                    itens: carrinho,
-                    maoObra: maoObra,
-                    data: data,
-                    dataCriacao: new Date().toISOString(),
-                    status: 'Ativo'
+                const tbody = document.getElementById('pdf-itens');
+                tbody.innerHTML = '';
+                carrinho.forEach(item => {
+                    tbody.innerHTML += `<tr><td style="padding:10px">${item.nome}</td><td style="padding:10px">${item.qtd}</td><td style="padding:10px">R$ ${item.venda.toFixed(2)}</td><td style="padding:10px">R$ ${item.total.toFixed(2)}</td></tr>`;
                 });
 
-                // 2. Registrar Entrada Financeira (Se for Venda ou Mão de Obra)
-                let valorEntrada = maoObra;
-                if(tipo === 'venda') {
-                    valorEntrada += carrinho.reduce((acc, item) => acc + item.total, 0);
-                }
+                const serv = Number(document.getElementById('cli-servico').value);
+                document.getElementById('pdf-total-prod').innerText = window.totalProdutos.toFixed(2);
+                document.getElementById('pdf-total-serv').innerText = serv.toFixed(2);
+                document.getElementById('pdf-total-geral').innerText = (window.totalProdutos + serv).toFixed(2);
+
+                // Gerar PDF
+                const element = document.getElementById('pdf-template');
+                element.style.display = 'block'; // Mostrar rapidinho pra renderizar
+                html2pdf(element, {
+                    margin: 10,
+                    filename: `Orcamento_${osNum}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                }).then(() => {
+                    element.style.display = 'none'; // Esconder de novo
+                });
+            };
+
+            // 4. FECHAR VENDA (BAIXA ESTOQUE)
+            window.fecharVenda = async () => {
+                if(!confirm("Tem certeza que o cliente aprovou? Isso vai baixar o estoque.")) return;
                 
-                if(valorEntrada > 0) {
-                    await addDoc(collection(db, "movimentacoes"), {
-                        tipo: 'entrada',
-                        descricao: `Pedido ${cliente} (${tipo})`,
-                        valor: valorEntrada,
-                        data: data
+                const cliente = document.getElementById('cli-nome').value;
+                const serv = Number(document.getElementById('cli-servico').value);
+                const data = document.getElementById('cli-data').value || new Date().toISOString().split('T')[0];
+                const totalVenda = window.totalProdutos + serv;
+                const custoProdutos = carrinho.reduce((acc, i) => acc + (i.custo * i.qtd), 0);
+
+                // 1. Salvar Venda
+                await addDoc(collection(db, "vendas"), {
+                    cliente, servico: serv, total: totalVenda, custoProd: custoProdutos, 
+                    itens: carrinho, data: data, timestamp: new Date()
+                });
+
+                // 2. Baixar Estoque
+                for (let item of carrinho) {
+                    await updateDoc(doc(db, "estoque", item.id), { qtd: increment(-item.qtd) });
+                }
+
+                alert("Venda Aprovada! Estoque Atualizado.");
+                carrinho = []; renderCarrinho(); document.getElementById('cli-nome').value = '';
+            };
+
+            // 5. ESTOQUE (SOMA INTELIGENTE)
+            window.salvarEstoque = async () => {
+                const nome = document.getElementById('est-nome').value;
+                const qtd = Number(document.getElementById('est-qtd').value);
+                const custo = Number(document.getElementById('est-custo').value);
+                const venda = Number(document.getElementById('est-venda').value);
+
+                // Verificar se já existe pelo nome
+                const q = query(collection(db, "estoque"), where("nome", "==", nome));
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    // Já existe: SOMA
+                    const docId = querySnapshot.docs[0].id;
+                    await updateDoc(doc(db, "estoque", docId), { 
+                        qtd: increment(qtd), custo: custo, venda: venda // Atualiza preço também
                     });
+                    alert(`Produto já existia. Quantidade somada! (+${qtd})`);
+                } else {
+                    // Novo: CRIA
+                    await addDoc(collection(db, "estoque"), { nome, qtd, custo, venda });
+                    alert("Novo produto cadastrado!");
                 }
-
-                // 3. Baixar Estoque Item por Item
-                for(let item of carrinho) {
-                    const ref = doc(db, "estoque", item.id);
-                    await updateDoc(ref, { qtd: increment(-item.qtd) });
-                }
-
-                alert("Pedido Fechado com Sucesso!");
-                carrinho = [];
-                atualizarTabelaCarrinho();
-                document.getElementById('ped-cliente').value = '';
             };
 
-            // 4. CADASTRO DE PRODUTO
-            window.salvarProduto = async () => {
-                await addDoc(collection(db, "estoque"), {
-                    nome: document.getElementById('cad-nome').value,
-                    custo: Number(document.getElementById('cad-custo').value),
-                    venda: Number(document.getElementById('cad-venda').value),
-                    aluguel: Number(document.getElementById('cad-aluguel').value),
-                    qtd: Number(document.getElementById('cad-qtd').value)
-                });
-                alert("Produto salvo!");
-            };
-
-            // 5. LANÇAR DESPESA
+            // 6. DESPESAS
             window.lancarDespesa = async () => {
-                await addDoc(collection(db, "movimentacoes"), {
-                    tipo: 'saida',
-                    descricao: document.getElementById('gasto-desc').value,
-                    valor: Number(document.getElementById('gasto-valor').value),
-                    data: document.getElementById('gasto-data').value
+                await addDoc(collection(db, "despesas"), {
+                    desc: document.getElementById('desp-desc').value,
+                    valor: Number(document.getElementById('desp-valor').value),
+                    data: document.getElementById('desp-data').value
                 });
-                alert("Despesa Registrada!");
+                alert("Despesa salva!");
+                carregarUltimasDespesas();
             };
 
-            // 6. PAINEL FINANCEIRO
-            onSnapshot(collection(db, "movimentacoes"), (snap) => {
-                let entradas = 0;
-                let saidas = 0;
-                const tbDespesas = document.getElementById('tabela-despesas');
-                tbDespesas.innerHTML = '';
+            function carregarUltimasDespesas() {
+                // Simplificado: Carregar ultimas 5 (Na pratica use query com limit)
+            }
 
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    if(d.tipo === 'entrada') entradas += d.valor;
-                    if(d.tipo === 'saida') {
-                        saidas += d.valor;
-                        tbDespesas.innerHTML += `<tr><td>${d.descricao}</td><td style="color:red">- R$ ${d.valor}</td></tr>`;
-                    }
-                });
+            // 7. FINANCEIRO COM FILTRO
+            window.filtrarFinanceiro = async () => {
+                const inicio = document.getElementById('filtro-inicio').value;
+                const fim = document.getElementById('filtro-fim').value;
 
-                // Precisamos somar também o custo dos produtos comprados (saída de estoque)
-                // Para simplificar, vamos assumir que a 'saida' aqui são gastos operacionais
-                // Se quiser apurar lucro real, teria que somar custo dos produtos vendidos.
+                // Buscar Vendas no Periodo
+                const qVendas = query(collection(db, "vendas"), where("data", ">=", inicio), where("data", "<=", fim));
+                const snapVendas = await getDocs(qVendas);
                 
-                document.getElementById('fin-entradas').innerText = `R$ ${entradas.toFixed(2)}`;
-                document.getElementById('fin-saidas').innerText = `R$ ${saidas.toFixed(2)}`;
-                document.getElementById('fin-lucro').innerText = `R$ ${(entradas - saidas).toFixed(2)}`;
-            });
+                let faturamento = 0;
+                let custoProdutosVendidos = 0;
 
-            // 7. HISTÓRICO PEDIDOS
-            onSnapshot(collection(db, "pedidos"), (snap) => {
-                const tb = document.getElementById('tabela-historico');
-                tb.innerHTML = '<thead><tr><th>Cliente</th><th>Tipo</th><th>Total Itens</th><th>Mão Obra</th><th>Data</th></tr></thead>';
-                snap.forEach(doc => {
-                    const p = doc.data();
-                    // Soma total dos itens
-                    const totalItens = p.itens.reduce((acc, i) => acc + i.total, 0);
-                    tb.innerHTML += `
-                        <tr>
-                            <td>${p.cliente}</td>
-                            <td>${p.tipo.toUpperCase()}</td>
-                            <td>R$ ${totalItens.toFixed(2)}</td>
-                            <td>R$ ${p.maoObra.toFixed(2)}</td>
-                            <td>${p.data}</td>
-                        </tr>
-                    `;
+                snapVendas.forEach(d => {
+                    const v = d.data();
+                    faturamento += v.total;
+                    custoProdutosVendidos += v.custoProd;
                 });
-            });
+
+                // Buscar Despesas no Periodo
+                const qDesp = query(collection(db, "despesas"), where("data", ">=", inicio), where("data", "<=", fim));
+                const snapDesp = await getDocs(qDesp);
+                
+                let totalDespesas = 0;
+                snapDesp.forEach(d => totalDespesas += d.data().valor);
+
+                // Calcular
+                const totalSaidas = custoProdutosVendidos + totalDespesas;
+                const lucro = faturamento - totalSaidas;
+
+                document.getElementById('kpi-faturamento').innerText = "R$ " + faturamento.toFixed(2);
+                document.getElementById('kpi-saidas').innerText = "R$ " + totalSaidas.toFixed(2);
+                const elLucro = document.getElementById('kpi-lucro');
+                elLucro.innerText = "R$ " + lucro.toFixed(2);
+                elLucro.style.color = lucro >= 0 ? 'var(--success)' : 'var(--danger)';
+            };
         }
     </script>
 </body>
