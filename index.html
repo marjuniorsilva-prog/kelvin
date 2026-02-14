@@ -1,144 +1,6 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.S SERVIÇO - Gestão de Segurança</title>
-    <style>
-        :root {
-            --primary: #1a2a3a; /* Azul Escuro Profissional */
-            --accent: #d4af37;  /* Detalhes em Ouro para nível Gaby e Lena */
-            --success: #27ae60;
-            --danger: #c0392b;
-            --bg: #f8f9fa;
-        }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: #333; }
-        
-        /* Header Premium */
-        header { 
-            background: var(--primary); 
-            color: white; 
-            padding: 2rem; 
-            text-align: center; 
-            border-bottom: 4px solid var(--accent);
-        }
-        header h1 { margin: 0; letter-spacing: 2px; font-size: 2.5rem; }
-        header p { margin-top: 5px; opacity: 0.8; font-size: 0.9rem; }
-
-        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
-
-        /* Cards de Resumo */
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 40px; }
-        .card { 
-            background: white; padding: 25px; border-radius: 12px; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05); border-top: 5px solid var(--accent);
-        }
-        .card h3 { margin: 0; color: #7f8c8d; font-size: 1rem; text-transform: uppercase; }
-        .card p { font-size: 1.8rem; font-weight: bold; margin: 10px 0 0; color: var(--primary); }
-
-        /* Formulários */
-        .glass-panel { 
-            background: white; padding: 30px; border-radius: 15px; 
-            margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
-        }
-        .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-        input, select { padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; }
-        
-        button { 
-            background: var(--primary); color: white; padding: 12px 25px; 
-            border: none; border-radius: 8px; cursor: pointer; font-weight: bold;
-            transition: 0.3s;
-        }
-        button:hover { background: var(--accent); transform: translateY(-2px); }
-
-        /* Tabela */
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden; }
-        th { background: var(--primary); color: white; padding: 15px; text-align: left; }
-        td { padding: 15px; border-bottom: 1px solid #eee; }
-        .badge { padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
-        .badge-aluguel { background: #e1f5fe; color: #0288d1; }
-        .badge-venda { background: #e8f5e9; color: #2e7d32; }
-
-        footer { text-align: center; padding: 40px; color: #7f8c8d; font-size: 0.85rem; }
-    </style>
-</head>
-<body>
-
-<header>
-    <h1>K.S SERVIÇO</h1>
-    <p>Tecnologia em Segurança & Monitoramento</p>
-</header>
-
-<div class="container">
-    <div class="stats">
-        <div class="card">
-            <h3>Estoque Disponível</h3>
-            <p id="total-estoque">--</p>
-        </div>
-        <div class="card">
-            <h3>Lucro em Vendas</h3>
-            <p id="lucro-total" style="color: var(--success);">R$ 0,00</p>
-        </div>
-        <div class="card">
-            <h3>Receita de Aluguel (Mensal)</h3>
-            <p id="recorrencia" style="color: var(--accent);">R$ 0,00</p>
-        </div>
-    </div>
-
-    <div class="glass-panel">
-        <h2>📦 Cadastro de Equipamento</h2>
-        <div class="grid-inputs">
-            <input type="text" id="nome-prod" placeholder="Modelo (Ex: Câmera 4K)">
-            <input type="number" id="custo-prod" placeholder="Custo (R$)">
-            <input type="number" id="venda-prod" placeholder="Preço Venda (R$)">
-            <input type="number" id="aluguel-prod" placeholder="Aluguel/Mês (R$)">
-            <input type="number" id="qtd-prod" placeholder="Qtd">
-            <button id="btn-salvar">Cadastrar</button>
-        </div>
-    </div>
-
-    <div class="glass-panel">
-        <h2>📝 Nova Ordem de Serviço / Contrato</h2>
-        <div class="grid-inputs">
-            <select id="select-equipamento"><option>Carregando estoque...</option></select>
-            <select id="tipo-operacao">
-                <option value="venda">Venda Direta</option>
-                <option value="aluguel">Aluguel Recorrente</option>
-            </select>
-            <input type="text" id="cliente-nome" placeholder="Nome do Cliente">
-            <input type="number" id="taxa-servico" placeholder="Mão de Obra (R$)">
-            <input type="date" id="data-cobranca" title="Data de Cobrança Mensal">
-            <button id="btn-finalizar" style="background: var(--success);">Lançar no Sistema</button>
-        </div>
-    </div>
-
-    <div class="glass-panel">
-        <h2>🔍 Rastreio de Equipamentos e Cobranças</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Cliente</th>
-                    <th>Equipamento</th>
-                    <th>Tipo</th>
-                    <th>Vencimento</th>
-                    <th>Status</th>
-                    <th>Ação</th>
-                </tr>
-            </thead>
-            <tbody id="tabela-ativos"></tbody>
-        </table>
-    </div>
-</div>
-
-<footer>
-    <p><strong>52.975.677 Kelvin Eduardo da Silva</strong><br>
-    CNPJ: 52.975.677/0001-49<br>
-    Rua Antonio Bernardes da Silva 33, Cesar Capato - Jardinópolis SP - 14680-000</p>
-</footer>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, query, where, onSnapshot } 
+    import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, deleteDoc, onSnapshot, getDoc, increment } 
     from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -153,68 +15,138 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // --- FUNÇÕES DE INTERAÇÃO ---
-
-    // 1. Cadastrar no Estoque
+    // --- 1. CADASTRAR PRODUTO ---
     document.getElementById('btn-salvar').addEventListener('click', async () => {
-        const prod = {
-            nome: document.getElementById('nome-prod').value,
-            custo: Number(document.getElementById('custo-prod').value),
-            venda: Number(document.getElementById('venda-prod').value),
-            aluguel: Number(document.getElementById('aluguel-prod').value),
-            qtd: Number(document.getElementById('qtd-prod').value)
-        };
-        await addDoc(collection(db, "estoque"), prod);
-        alert("K.S SERVIÇO: Equipamento adicionado!");
+        try {
+            const prod = {
+                nome: document.getElementById('nome-prod').value,
+                custo: Number(document.getElementById('custo-prod').value),
+                venda: Number(document.getElementById('venda-prod').value),
+                aluguel: Number(document.getElementById('aluguel-prod').value),
+                qtd: Number(document.getElementById('qtd-prod').value)
+            };
+            await addDoc(collection(db, "estoque"), prod);
+            alert("K.S SERVIÇO: Equipamento cadastrado com sucesso!");
+            location.reload(); // Atualiza para limpar campos
+        } catch (error) {
+            console.error("Erro ao cadastrar:", error);
+            alert("Erro ao salvar produto.");
+        }
     });
 
-    // 2. Carregar Estoque no Select
+    // --- 2. CARREGAR SELECT E ATUALIZAR ESTOQUE NA TELA ---
+    let produtosMap = {}; // Para guardar os nomes dos produtos
+
     onSnapshot(collection(db, "estoque"), (snapshot) => {
         const select = document.getElementById('select-equipamento');
-        select.innerHTML = '';
-        snapshot.forEach(doc => {
-            const item = doc.data();
-            select.innerHTML += `<option value="${doc.id}">${item.nome} (${item.qtd} un)</option>`;
+        select.innerHTML = '<option value="">Selecione...</option>';
+        let totalItens = 0;
+
+        snapshot.forEach(docSnap => {
+            const item = docSnap.data();
+            produtosMap[docSnap.id] = item; // Salva para usar depois
+            select.innerHTML += `<option value="${docSnap.id}">${item.nome} (Disp: ${item.qtd})</option>`;
+            totalItens += item.qtd;
         });
-        document.getElementById('total-estoque').innerText = snapshot.size + " Modelos";
+        document.getElementById('total-estoque').innerText = totalItens + " Unidades";
     });
 
-    // 3. Finalizar Venda ou Aluguel (Baixa Automática)
+    // --- 3. FINALIZAR VENDA OU ALUGUEL (COM BAIXA NO ESTOQUE) ---
     document.getElementById('btn-finalizar').addEventListener('click', async () => {
+        const idProduto = document.getElementById('select-equipamento').value;
+        const qtdAtual = produtosMap[idProduto].qtd;
+
+        if (qtdAtual <= 0) {
+            alert("ERRO: Produto sem estoque!");
+            return;
+        }
+
         const tipo = document.getElementById('tipo-operacao').value;
+        const nomeProd = produtosMap[idProduto].nome; // Pega o nome certo
+
         const operacao = {
             cliente: document.getElementById('cliente-nome').value,
             tipo: tipo,
-            taxa: document.getElementById('taxa-servico').value,
+            taxaInstalacao: Number(document.getElementById('taxa-servico').value),
             dataCobranca: document.getElementById('data-cobranca').value,
             status: 'Ativo',
-            equipamentoId: document.getElementById('select-equipamento').value,
+            equipamentoId: idProduto,
+            equipamentoNome: nomeProd, // Salva o nome para mostrar na tabela
+            valorContrato: tipo === 'venda' ? produtosMap[idProduto].venda : produtosMap[idProduto].aluguel,
             dataRegistro: new Date()
         };
 
+        // Salva o contrato
         await addDoc(collection(db, "contratos"), operacao);
-        alert("Operação registrada com sucesso!");
+
+        // Abate do Estoque (-1)
+        const produtoRef = doc(db, "estoque", idProduto);
+        await updateDoc(produtoRef, {
+            qtd: increment(-1)
+        });
+
+        alert("Operação registrada! Estoque atualizado.");
     });
 
-    // 4. Carregar Tabela de Ativos
+    // --- 4. CARREGAR TABELA E SOMAR LUCROS ---
     onSnapshot(collection(db, "contratos"), (snapshot) => {
         const tabela = document.getElementById('tabela-ativos');
         tabela.innerHTML = '';
-        snapshot.forEach(doc => {
-            const res = doc.data();
+        
+        let lucroVendas = 0;
+        let receitaMensal = 0;
+
+        snapshot.forEach(docSnap => {
+            const res = docSnap.data();
+            const id = docSnap.id;
+
+            // Só soma se estiver ATIVO
+            if (res.status === 'Ativo') {
+                if (res.tipo === 'venda') {
+                    // Lucro Venda = (Valor Venda + Instalação) - (Custo não temos aqui fácil, somamos faturamento bruto)
+                    lucroVendas += (res.valorContrato + res.taxaInstalacao);
+                } else {
+                    receitaMensal += res.valorContrato;
+                }
+            }
+
+            // Cria a linha da tabela
+            const classeStatus = res.status === 'Ativo' ? 'success' : 'danger';
+            const botaoAcao = res.status === 'Ativo' 
+                ? `<button onclick="window.devolverItem('${id}', '${res.equipamentoId}')" style="background:#c0392b; padding:5px; font-size:12px;">Devolver/Cancelar</button>` 
+                : '<span style="color:red;">Encerrado</span>';
+
             tabela.innerHTML += `
                 <tr>
                     <td>${res.cliente}</td>
-                    <td>Equipamento Linkado</td>
+                    <td>${res.equipamentoNome || 'Equipamento'}</td>
                     <td><span class="badge ${res.tipo === 'venda' ? 'badge-venda' : 'badge-aluguel'}">${res.tipo.toUpperCase()}</span></td>
-                    <td>${res.dataCobranca || 'N/A'}</td>
-                    <td>${res.status}</td>
-                    <td><button onclick="console.log('encerrar')" style="padding: 5px; font-size: 0.7rem;">Encerrar</button></td>
+                    <td>Dia ${res.dataCobranca ? res.dataCobranca.slice(-2) : 'N/A'}</td>
+                    <td style="font-weight:bold;">${res.status}</td>
+                    <td>${botaoAcao}</td>
                 </tr>
             `;
         });
+
+        // Atualiza os Cards de Dinheiro
+        document.getElementById('lucro-total').innerText = "R$ " + lucroVendas.toFixed(2);
+        document.getElementById('recorrencia').innerText = "R$ " + receitaMensal.toFixed(2);
     });
 
+    // --- 5. FUNÇÃO DE DEVOLUÇÃO (VOLTA PRO ESTOQUE) ---
+    // Precisamos expor essa função para o HTML global
+    window.devolverItem = async (idContrato, idProduto) => {
+        if(confirm("Confirmar devolução? O item voltará ao estoque e a cobrança vai parar.")) {
+            // 1. Muda status do contrato para Encerrado
+            const contratoRef = doc(db, "contratos", idContrato);
+            await updateDoc(contratoRef, { status: "Devolvido/Encerrado" });
+
+            // 2. Devolve item pro estoque (+1)
+            const produtoRef = doc(db, "estoque", idProduto);
+            await updateDoc(produtoRef, { qtd: increment(1) });
+
+            alert("Contrato cancelado e estoque reposto!");
+        }
+    };
+
 </script>
-</body>
-</html>
