@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.S SERVIÇO | Gestão V10.3 (PDF Corrigido)</title>
+    <title>K.S SERVIÇO | Gestão V10.4 (Com Aluguel)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -37,7 +37,7 @@
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
         th { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; }
         .badge { padding: 5px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; color:white; }
-        .bg-pendente { background: var(--accent); color: black; } .bg-pago { background: var(--success); } .bg-atrasado { background: var(--danger); }
+        .bg-pendente { background: var(--accent); color: black; } .bg-pago { background: var(--success); } .bg-atrasado { background: var(--danger); } .bg-cancelado { background: #666; }
 
         .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px; }
         .kpi-card { background: var(--secondary); padding: 20px; border-radius: 10px; border: 1px solid var(--border); text-align: center; }
@@ -53,17 +53,17 @@
         #login-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: flex; justify-content: center; align-items: center; }
         .login-box { background: var(--secondary); padding: 40px; border-radius: 15px; border: 1px solid var(--accent); text-align: center; }
         
-        /* PDF TEMPLATE (OCULTO) */
         #pdf-template { display: none; background: white; color: black; padding: 40px; font-family: Arial, sans-serif; width: 800px; }
     </style>
 </head>
 <body>
 
-    <div id="login-overlay"><div class="login-box"><h1 style="color:var(--accent)">K.S SERVIÇO</h1><p>Sistema V10.3 (PDF ON)</p><button class="btn-gold" onclick="loginGoogle()">Acessar</button></div></div>
+    <div id="login-overlay"><div class="login-box"><h1 style="color:var(--accent)">K.S SERVIÇO</h1><p>Sistema V10.4</p><button class="btn-gold" onclick="loginGoogle()">Acessar</button></div></div>
 
     <aside>
         <div class="brand">K.S SERVIÇO</div>
         <div class="menu-item active" onclick="nav('orcamentos')"><i class="fa-solid fa-file-invoice"></i> Orçamentos</div>
+        <div class="menu-item" onclick="nav('contratos')"><i class="fa-solid fa-file-contract"></i> Contratos / Aluguéis</div>
         <div class="menu-item" onclick="nav('compras')"><i class="fa-solid fa-cart-shopping"></i> Compras & Estoque</div>
         <div class="menu-item" onclick="nav('financeiro')"><i class="fa-solid fa-chart-line"></i> Fluxo de Caixa</div>
         <div class="menu-item" onclick="nav('receber')"><i class="fa-solid fa-hand-holding-dollar"></i> A Receber</div>
@@ -92,15 +92,12 @@
                 <div class="row">
                     <div class="col"><label>Bairro</label><input type="text" id="cli-bairro"></div>
                     <div class="col"><label>Cidade</label><input type="text" id="cli-cidade"></div>
-                    <div class="col"><label>Doc (CPF/CNPJ)</label><input type="text" id="cli-doc"></div>
+                    <div class="col"><label>Doc</label><input type="text" id="cli-doc"></div>
                     <div class="col"><label>Tipo</label><select id="cli-tipo"><option value="Venda">Venda</option><option value="Aluguel">Aluguel</option></select></div>
                 </div>
-
+                
                 <div class="row">
-                    <div class="col">
-                        <label>Observações (Sai no PDF)</label>
-                        <textarea id="cli-obs" placeholder="Ex: Fios inclusos. Garantia de 90 dias."></textarea>
-                    </div>
+                    <div class="col"><label>Observações (PDF)</label><textarea id="cli-obs"></textarea></div>
                 </div>
 
                 <div class="row" style="background:#020617; padding:15px; border-radius:8px; align-items:flex-end;">
@@ -121,6 +118,21 @@
                     <button class="btn-green col" id="btn-aprovar" onclick="aprovarFinalizar()" style="display:none;">✅ APROVAR VENDA</button>
                     <button class="btn-blue col" onclick="gerarPDF()">📄 PDF</button>
                 </div>
+            </div>
+        </div>
+
+        <div id="contratos" class="section">
+            <div class="panel">
+                <h2>Contratos Ativos</h2>
+                <p style="color:#aaa; font-size:0.9rem;">Gerencie quem está com seus equipamentos.</p>
+                <table id="tb-contratos">
+                    <thead><tr><th>Cliente</th><th>Data Início</th><th>Valor</th><th>Ação</th></tr></thead>
+                    <tbody id="lista-contratos"></tbody>
+                </table>
+            </div>
+            <div class="panel" style="border-left:5px solid #666">
+                <h2>Cancelados</h2>
+                <table id="tb-cancelados"><thead><tr><th>Cliente</th><th>Data</th><th>Status</th></tr></thead><tbody id="lista-cancelados"></tbody></table>
             </div>
         </div>
 
@@ -179,9 +191,7 @@
             <p><strong>Cliente:</strong> <span id="pdf-cli"></span></p>
             <p><strong>Endereço:</strong> <span id="pdf-end"></span></p>
         </div>
-        <div style="border:1px solid #ddd; padding:10px; margin:10px 0;">
-            <strong>Observações:</strong> <span id="pdf-obs-view"></span>
-        </div>
+        <div style="border:1px solid #ddd; padding:10px; margin:10px 0;"><strong>Observações:</strong> <span id="pdf-obs-view"></span></div>
         <table id="pdf-tb" style="width:100%; border-collapse:collapse; margin-top:20px;"><thead><tr style="background:#333; color:white;"><th>Item</th><th>Qtd</th><th>Unit.</th><th>Total</th></tr></thead><tbody id="pdf-body"></tbody></table>
         <div style="text-align:right; margin-top:20px;"><h3>TOTAL GERAL: R$ <span id="pdf-total">0,00</span></h3></div>
     </div>
@@ -213,10 +223,21 @@
             });
             onSnapshot(query(collection(db, "orcamentos"), orderBy("data", "desc")), (snap) => {
                 const tb = document.getElementById('lista-pedidos'); tb.innerHTML = '';
+                const tbContratos = document.getElementById('lista-contratos'); tbContratos.innerHTML = '';
+                const tbCancel = document.getElementById('lista-cancelados'); tbCancel.innerHTML = '';
+
                 snap.forEach(d => {
                     const o = d.data();
                     let btn = o.status==='Pendente' ? `<button class="btn-blue btn-sm" onclick="editarPedido('${d.id}')">Editar</button>` : 'Fechado';
                     tb.innerHTML += `<tr><td>${o.data}</td><td>${o.cliente}</td><td>R$ ${o.total.toFixed(2)}</td><td>${o.status}</td><td>${btn}</td></tr>`;
+                    
+                    // ALUGUÉIS ATIVOS (O QUE FALTAVA)
+                    if(o.tipo==='Aluguel' && o.status==='Aprovado'){
+                        tbContratos.innerHTML += `<tr><td>${o.cliente}</td><td>${o.data}</td><td>R$ ${o.total.toFixed(2)}/mês</td><td><button class="btn-red btn-sm" onclick="encerrarContrato('${d.id}')">ENCERRAR</button></td></tr>`;
+                    }
+                    if(o.tipo==='Aluguel' && o.status==='Cancelado'){
+                        tbCancel.innerHTML += `<tr><td>${o.cliente}</td><td>${o.data}</td><td>Cancelado</td></tr>`;
+                    }
                 });
             });
             onSnapshot(collection(db, "financeiro"), (snap) => { 
@@ -230,60 +251,46 @@
             });
         }
 
+        // --- ENCERRAR CONTRATO (RETORNA ESTOQUE E GERA MULTA) ---
+        window.encerrarContrato = async (id) => {
+            if(!confirm("Encerrar contrato? Itens voltarão ao estoque.")) return;
+            const docRef = doc(db, "orcamentos", id);
+            const contrato = (await getDoc(docRef)).data();
+            
+            // 1. Devolve Estoque
+            for(let item of contrato.itens) {
+                await updateDoc(doc(db, "estoque", item.id), { qtd: increment(item.qtd) });
+            }
+
+            // 2. Multa
+            const multaStr = prompt("Valor da Multa (R$)? (Deixe 0 se não tiver)", "0");
+            const multa = Number(multaStr);
+            if(multa > 0) {
+                const venc = prompt("Data Vencimento Multa:", new Date().toISOString().split('T')[0]);
+                await addDoc(collection(db, "financeiro"), {
+                    tipo: 'receita', cliente: contrato.cliente, descricao: 'Multa Cancelamento', valor: multa, vencimento: venc, status: 'Pendente'
+                });
+            }
+
+            await updateDoc(docRef, { status: 'Cancelado' });
+            alert("Contrato Encerrado!");
+        };
+
         // --- PREÇO EDITÁVEL ---
-        window.atualizarPreco = () => {
-            const id = document.getElementById('cart-sel').value;
-            if(id && estoqueMap[id]) document.getElementById('cart-preco').value = estoqueMap[id].venda;
-        };
-        window.addCart = () => {
-            const id = document.getElementById('cart-sel').value;
-            const qtd = Number(document.getElementById('cart-qtd').value);
-            const preco = Number(document.getElementById('cart-preco').value); 
-            if(!id) return;
-            const p = estoqueMap[id];
-            carrinho.push({id, nome:p.nome, venda:preco, qtd, total:preco*qtd});
-            renderCart();
-        };
-        function renderCart() {
-            const tb = document.getElementById('cart-body'); tb.innerHTML=''; let s=0;
-            carrinho.forEach((i,x)=>{ s+=i.total; tb.innerHTML+=`<tr><td>${i.nome}</td><td>${i.qtd}</td><td>${i.venda}</td><td>${i.total}</td><td><button onclick="carrinho.splice(${x},1);renderCart()">X</button></td></tr>`});
-            window.totalProd=s; calcTotal();
-        }
+        window.atualizarPreco = () => { const id = document.getElementById('cart-sel').value; if(id && estoqueMap[id]) document.getElementById('cart-preco').value = estoqueMap[id].venda; };
+        window.addCart = () => { const id = document.getElementById('cart-sel').value; const qtd = Number(document.getElementById('cart-qtd').value); const preco = Number(document.getElementById('cart-preco').value); if(!id) return; const p = estoqueMap[id]; carrinho.push({id, nome:p.nome, venda:preco, qtd, total:preco*qtd}); renderCart(); };
+        function renderCart() { const tb = document.getElementById('cart-body'); tb.innerHTML=''; let s=0; carrinho.forEach((i,x)=>{ s+=i.total; tb.innerHTML+=`<tr><td>${i.nome}</td><td>${i.qtd}</td><td>${i.venda}</td><td>${i.total}</td><td><button onclick="carrinho.splice(${x},1);renderCart()">X</button></td></tr>`}); window.totalProd=s; calcTotal(); }
         window.calcTotal=()=>{document.getElementById('total-display').innerText="R$ "+((window.totalProd||0)+Number(document.getElementById('cli-serv').value)).toFixed(2)};
 
         // --- ORÇAMENTO ---
         window.novoOrcamento = () => { idEdicao=null; carrinho=[]; renderCart(); document.getElementById('form-orcamento').style.display='block'; document.getElementById('btn-aprovar').style.display='none'; document.querySelectorAll('#form-orcamento input').forEach(i=>i.value=''); document.getElementById('cli-obs').value=''; };
-        
-        window.editarPedido = async (id) => {
-            const d = (await getDoc(doc(db,"orcamentos",id))).data();
-            idEdicao=id; document.getElementById('form-orcamento').style.display='block';
-            document.getElementById('cli-nome').value=d.cliente;
-            document.getElementById('cli-doc').value=d.doc;
-            document.getElementById('cli-cep').value=d.end.cep;
-            document.getElementById('cli-rua').value=d.end.rua;
-            document.getElementById('cli-num').value=d.end.num;
-            document.getElementById('cli-bairro').value=d.end.bairro;
-            document.getElementById('cli-cidade').value=d.end.cidade;
-            document.getElementById('cli-tipo').value=d.tipo;
-            document.getElementById('cli-obs').value=d.obs||'';
-            document.getElementById('cli-serv').value=d.servico;
-            carrinho=d.itens; renderCart();
-            document.getElementById('btn-aprovar').style.display='block';
-        };
-
-        window.salvarRascunho = async () => {
-            const dados = pegarDados(); dados.status='Pendente';
-            if(idEdicao) await updateDoc(doc(db,"orcamentos",idEdicao), dados);
-            else { const ref=await addDoc(collection(db,"orcamentos"),dados); idEdicao=ref.id; document.getElementById('btn-aprovar').style.display='block'; }
-            alert("Salvo!");
-        };
+        window.editarPedido = async (id) => { const d = (await getDoc(doc(db,"orcamentos",id))).data(); idEdicao=id; document.getElementById('form-orcamento').style.display='block'; document.getElementById('cli-nome').value=d.cliente; document.getElementById('cli-doc').value=d.doc; document.getElementById('cli-cep').value=d.end.cep; document.getElementById('cli-rua').value=d.end.rua; document.getElementById('cli-num').value=d.end.num; document.getElementById('cli-bairro').value=d.end.bairro; document.getElementById('cli-cidade').value=d.end.cidade; document.getElementById('cli-tipo').value=d.tipo; document.getElementById('cli-obs').value=d.obs||''; document.getElementById('cli-serv').value=d.servico; carrinho=d.itens; renderCart(); document.getElementById('btn-aprovar').style.display='block'; };
+        window.salvarRascunho = async () => { const dados = pegarDados(); dados.status='Pendente'; if(idEdicao) await updateDoc(doc(db,"orcamentos",idEdicao), dados); else { const ref=await addDoc(collection(db,"orcamentos"),dados); idEdicao=ref.id; document.getElementById('btn-aprovar').style.display='block'; } alert("Salvo!"); };
 
         window.aprovarFinalizar = async () => {
             if(!idEdicao) return alert("Salve antes");
             const tipo=document.getElementById('cli-tipo').value; const cliente=document.getElementById('cli-nome').value; const total=(window.totalProd||0)+Number(document.getElementById('cli-serv').value);
-            
             for(let i of carrinho) await updateDoc(doc(db,"estoque",i.id),{qtd:increment(-i.qtd)});
-
             if(tipo==='Venda'){
                 const parc=prompt("Quantas parcelas? (1 = À Vista)","1"); if(!parc)return;
                 const dt=prompt("1º Vencimento:", new Date().toISOString().split('T')[0]);
@@ -303,17 +310,8 @@
 
         // --- UTILS & PDF ---
         window.gerarPDF = () => {
-            document.getElementById('pdf-cli').innerText=document.getElementById('cli-nome').value;
-            document.getElementById('pdf-doc').innerText=document.getElementById('cli-doc').value;
-            document.getElementById('pdf-end').innerText=document.getElementById('cli-rua').value;
-            document.getElementById('pdf-data').innerText=new Date().toLocaleDateString();
-            document.getElementById('pdf-obs-view').innerText=document.getElementById('cli-obs').value;
-            
-            const tb=document.getElementById('pdf-body'); tb.innerHTML='';
-            carrinho.forEach(i=>tb.innerHTML+=`<tr><td>${i.nome}</td><td>${i.qtd}</td><td>${i.venda}</td><td>${i.total}</td></tr>`);
-            document.getElementById('pdf-total').innerText=document.getElementById('total-display').innerText.replace('R$ ','');
-            
-            // CORREÇÃO: .save() Adicionado!
+            document.getElementById('pdf-cli').innerText=document.getElementById('cli-nome').value; document.getElementById('pdf-doc').innerText=document.getElementById('cli-doc').value; document.getElementById('pdf-end').innerText=document.getElementById('cli-rua').value; document.getElementById('pdf-data').innerText=new Date().toLocaleDateString(); document.getElementById('pdf-obs-view').innerText=document.getElementById('cli-obs').value;
+            const tb=document.getElementById('pdf-body'); tb.innerHTML=''; carrinho.forEach(i=>tb.innerHTML+=`<tr><td>${i.nome}</td><td>${i.qtd}</td><td>${i.venda}</td><td>${i.total}</td></tr>`); document.getElementById('pdf-total').innerText=document.getElementById('total-display').innerText.replace('R$ ','');
             const el=document.getElementById('pdf-template'); el.style.display='block';
             html2pdf().from(el).set({ margin: 10, filename: 'Orcamento_KS.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).save().then(() => { el.style.display = 'none'; });
         };
