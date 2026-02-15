@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.S SERVIÇO | Gestão Estável (V10 + Ajustes)</title>
+    <title>K.S SERVIÇO | Sistema Final (V12)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,7 +14,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; font-family: 'Roboto', sans-serif; }
         body { background: var(--primary); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
 
-        /* SIDEBAR (Igual V10) */
+        /* SIDEBAR */
         aside { width: 260px; background: var(--secondary); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
         .brand { padding: 30px; text-align: center; color: var(--accent); font-size: 1.4rem; font-weight: bold; border-bottom: 1px solid var(--border); }
         .menu-item { padding: 15px 25px; cursor: pointer; color: #94a3b8; transition: 0.3s; display: flex; align-items: center; gap: 10px; font-weight: 500; }
@@ -25,19 +25,19 @@
         .section { display: none; animation: fadeIn 0.3s; } .section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+        /* UI ELEMENTS */
         .panel { background: var(--secondary); padding: 25px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 25px; }
         h2 { color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 20px; font-size: 1.2rem; }
-
         .row { display: flex; gap: 15px; margin-bottom: 15px; } .col { flex: 1; } .col-small { width: 140px; }
         label { display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--muted); }
         input, select, textarea { width: 100%; padding: 12px; background: #020617; border: 1px solid var(--border); color: white; border-radius: 6px; }
         textarea { resize: vertical; height: 60px; }
-
+        
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
         th { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; }
         .badge { padding: 5px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; color:white; }
-        .bg-pendente { background: var(--accent); color: black; } .bg-pago { background: var(--success); } .bg-atrasado { background: var(--danger); }
+        .bg-pendente { background: var(--accent); color: black; } .bg-pago { background: var(--success); } .bg-atrasado { background: var(--danger); } .bg-cancelado { background: #666; }
 
         .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px; }
         .kpi-card { background: var(--secondary); padding: 20px; border-radius: 10px; border: 1px solid var(--border); text-align: center; }
@@ -58,14 +58,15 @@
 </head>
 <body>
 
-    <div id="login-overlay"><div class="login-box"><h1 style="color:var(--accent)">K.S SERVIÇO</h1><p>Sistema V10.2 (Corrigido)</p><button class="btn-gold" onclick="loginGoogle()">Acessar</button></div></div>
+    <div id="login-overlay"><div class="login-box"><h1 style="color:var(--accent)">K.S SERVIÇO</h1><p>Sistema Final V12</p><button class="btn-gold" onclick="loginGoogle()">Acessar</button></div></div>
 
     <aside>
         <div class="brand">K.S SERVIÇO</div>
         <div class="menu-item active" onclick="nav('orcamentos')"><i class="fa-solid fa-file-invoice"></i> Orçamentos</div>
-        <div class="menu-item" onclick="nav('compras')"><i class="fa-solid fa-cart-shopping"></i> Compras & Estoque</div>
+        <div class="menu-item" onclick="nav('contratos')"><i class="fa-solid fa-file-contract"></i> Contratos / Aluguéis</div>
         <div class="menu-item" onclick="nav('financeiro')"><i class="fa-solid fa-chart-line"></i> Fluxo de Caixa</div>
         <div class="menu-item" onclick="nav('receber')"><i class="fa-solid fa-hand-holding-dollar"></i> A Receber</div>
+        <div class="menu-item" onclick="nav('compras')"><i class="fa-solid fa-boxes-stacked"></i> Estoque</div>
         <div style="margin-top:auto; padding:20px; text-align:center;"><a href="#" onclick="sair()" style="color:red">Sair</a></div>
     </aside>
 
@@ -96,15 +97,13 @@
                 </div>
 
                 <div class="row">
-                    <div class="col">
-                        <label>Observações (Aparece no PDF)</label>
-                        <textarea id="cli-obs" placeholder="Ex: Fios inclusos. Garantia de 90 dias."></textarea>
-                    </div>
+                    <div class="col"><label>Observações (PDF)</label><textarea id="cli-obs"></textarea></div>
                 </div>
 
                 <div class="row" style="background:#020617; padding:15px; border-radius:8px; align-items:flex-end;">
                     <div class="col" style="flex:2"><label>Produto</label><select id="cart-sel" onchange="atualizarPreco()"><option>Carregando...</option></select></div>
-                    <div class="col-small"><label>Unit. (R$)</label><input type="number" id="cart-preco"></div> <div class="col-small"><label>Qtd</label><input type="number" id="cart-qtd" value="1"></div>
+                    <div class="col-small"><label>Unit. (R$)</label><input type="number" id="cart-preco"></div>
+                    <div class="col-small"><label>Qtd</label><input type="number" id="cart-qtd" value="1"></div>
                     <div class="col-small"><button class="btn-blue" onclick="addCart()">+ Add</button></div>
                 </div>
                 <table style="margin-bottom:20px;"><thead><tr><th>Item</th><th>Qtd</th><th>Unit.</th><th>Total</th><th>Remover</th></tr></thead><tbody id="cart-body"></tbody></table>
@@ -116,9 +115,28 @@
 
                 <div class="row">
                     <button class="btn-gold col" id="btn-salvar" onclick="salvarRascunho()">💾 SALVAR (RASCUNHO)</button>
-                    <button class="btn-green col" id="btn-aprovar" onclick="aprovarFinalizar()" style="display:none;">✅ APROVAR VENDA</button>
+                    <button class="btn-green col" id="btn-aprovar" onclick="aprovarFinalizar()" style="display:none;">✅ APROVAR</button>
                     <button class="btn-blue col" onclick="gerarPDF()">📄 PDF</button>
                 </div>
+            </div>
+        </div>
+
+        <div id="contratos" class="section">
+            <div class="panel">
+                <h2>Contratos de Aluguel Ativos</h2>
+                <p style="color:#aaa; font-size:0.9rem;">Aqui você encerra contratos, cobra multas e devolve itens ao estoque.</p>
+                <table id="tb-contratos">
+                    <thead><tr><th>Cliente</th><th>Início</th><th>Valor Mensal</th><th>Itens Alugados</th><th>Ação</th></tr></thead>
+                    <tbody id="lista-contratos"></tbody>
+                </table>
+            </div>
+            
+            <div class="panel" style="border-left:5px solid #666;">
+                <h2>Contratos Encerrados / Cancelados</h2>
+                <table id="tb-contratos-inativos">
+                    <thead><tr><th>Cliente</th><th>Data Fim</th><th>Valor Era</th><th>Status</th></tr></thead>
+                    <tbody id="lista-contratos-inativos"></tbody>
+                </table>
             </div>
         </div>
 
@@ -126,26 +144,23 @@
             <div class="row">
                 <div class="col panel">
                     <h2>Cadastrar Produto</h2>
-                    <input type="text" id="cat-nome" placeholder="Nome do Produto"><br><br>
-                    <input type="number" id="cat-venda" placeholder="Preço Venda Padrão"><br><br>
+                    <input type="text" id="cat-nome" placeholder="Nome"><br><br>
+                    <input type="number" id="cat-venda" placeholder="Venda"><br><br>
                     <button class="btn-blue" style="width:100%" onclick="cadastrarCatalogo()">Cadastrar</button>
                 </div>
                 <div class="col panel" style="border-left: 5px solid red;">
-                    <h2 style="color:red">Entrada de Nota (Compra)</h2>
+                    <h2 style="color:red">Entrada Nota (Compra)</h2>
                     <select id="compra-sel"><option>...</option></select><br><br>
-                    <div class="row">
-                        <div class="col"><input type="number" id="compra-custo" placeholder="Custo Unit."></div>
-                        <div class="col"><input type="number" id="compra-qtd" placeholder="Qtd"></div>
-                    </div>
+                    <div class="row"><div class="col"><input type="number" id="compra-custo" placeholder="Custo"></div><div class="col"><input type="number" id="compra-qtd" placeholder="Qtd"></div></div>
                     <input type="date" id="compra-data"><br><br>
-                    <button class="btn-red" style="width:100%" onclick="lancarCompra()">Lançar Compra</button>
+                    <button class="btn-red" style="width:100%" onclick="lancarCompra()">Lançar</button>
                 </div>
             </div>
-            <div class="panel"><h2>Estoque Atual</h2><table id="tb-estoque"></table></div>
+            <div class="panel"><h2>Estoque</h2><table id="tb-estoque"></table></div>
         </div>
 
         <div id="financeiro" class="section">
-            <h2>Fluxo de Caixa (Real)</h2>
+            <h2>Fluxo de Caixa</h2>
             <div class="row">
                 <div class="col"><input type="date" id="fluxo-ini"></div>
                 <div class="col"><input type="date" id="fluxo-fim"></div>
@@ -157,15 +172,7 @@
                 <div class="kpi-card" style="border-left:5px solid orange"><h3>Saldo</h3><h2 id="kpi-saldo">R$ 0,00</h2></div>
             </div>
             <div class="panel"><table id="tb-fluxo"><thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Valor</th><th>Status</th></tr></thead><tbody id="lista-fluxo"></tbody></table></div>
-            <div class="panel" style="border-left:5px solid red">
-                <h3>Lançar Despesa (Gasolina/Outros)</h3>
-                <div class="row">
-                    <div class="col"><input type="text" id="desp-desc" placeholder="Motivo"></div>
-                    <div class="col"><input type="number" id="desp-valor" placeholder="Valor"></div>
-                    <div class="col"><input type="date" id="desp-data"></div>
-                    <div class="col-small"><button class="btn-red" onclick="lancarDespesa()">Lançar</button></div>
-                </div>
-            </div>
+            <div class="panel" style="border-left:5px solid red"><h3>Lançar Despesa</h3><div class="row"><div class="col"><input type="text" id="desp-desc" placeholder="Motivo"></div><div class="col"><input type="number" id="desp-valor" placeholder="Valor"></div><div class="col"><input type="date" id="desp-data"></div><div class="col-small"><button class="btn-red" onclick="lancarDespesa()">Lançar</button></div></div></div>
         </div>
 
         <div id="receber" class="section">
@@ -188,9 +195,7 @@
             <p><strong>Cliente:</strong> <span id="pdf-cli"></span></p>
             <p><strong>Endereço:</strong> <span id="pdf-end"></span></p>
         </div>
-        <div style="border:1px solid #ddd; padding:10px; margin:10px 0;">
-            <strong>Observações:</strong> <span id="pdf-obs"></span>
-        </div>
+        <div style="border:1px solid #ddd; padding:10px; margin:10px 0;"><strong>Observações:</strong> <span id="pdf-obs"></span></div>
         <table id="pdf-tb" style="width:100%; border-collapse:collapse; margin-top:20px;"><thead><tr style="background:#333; color:white;"><th>Item</th><th>Qtd</th><th>Unit.</th><th>Total</th></tr></thead><tbody id="pdf-body"></tbody></table>
         <div style="text-align:right; margin-top:20px;"><h3>TOTAL GERAL: R$ <span id="pdf-total">0,00</span></h3></div>
     </div>
@@ -198,7 +203,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, increment, query, orderBy, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, increment, query, orderBy, getDocs, getDoc, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyBbs5adc-5M46SujfgPpOYOHTjsncxce_8", authDomain: "kelvin-c16b4.firebaseapp.com", projectId: "kelvin-c16b4", storageBucket: "kelvin-c16b4.firebasestorage.app", messagingSenderId: "388075706958", appId: "1:388075706958:web:b2c631e8690cea14acc11f" };
         const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app);
@@ -222,146 +227,125 @@
             });
             onSnapshot(query(collection(db, "orcamentos"), orderBy("data", "desc")), (snap) => {
                 const tb = document.getElementById('lista-pedidos'); tb.innerHTML = '';
+                const tbContratos = document.getElementById('lista-contratos'); tbContratos.innerHTML = '';
+                const tbInativos = document.getElementById('lista-contratos-inativos'); tbInativos.innerHTML = '';
+
                 snap.forEach(d => {
                     const o = d.data();
+                    // Lista Geral Orçamentos
                     let btn = o.status==='Pendente' ? `<button class="btn-blue btn-sm" onclick="editarPedido('${d.id}')">Editar</button>` : 'Fechado';
-                    tb.innerHTML += `<tr><td>${o.data}</td><td>${o.cliente}</td><td>R$ ${o.total.toFixed(2)}</td><td>${o.status}</td><td>${btn}</td></tr>`;
+                    tb.innerHTML += `<tr><td>${o.data}</td><td>${o.cliente}</td><td>R$ ${o.total.toFixed(2)}</td><td><span class="badge ${o.status==='Pendente'?'bg-pendente':'bg-pago'}">${o.status}</span></td><td>${btn}</td></tr>`;
+                    
+                    // Lista Contratos Ativos (Aluguel Aprovado)
+                    if(o.tipo === 'Aluguel' && o.status === 'Aprovado') {
+                        // Calcula total itens
+                        let itensTexto = o.itens.map(i => `${i.qtd}x ${i.nome}`).join(', ');
+                        tbContratos.innerHTML += `
+                            <tr>
+                                <td>${o.cliente}</td>
+                                <td>${o.data}</td>
+                                <td>R$ ${o.total.toFixed(2)}/mês</td>
+                                <td style="font-size:0.8rem; max-width:200px;">${itensTexto}</td>
+                                <td><button class="btn-red btn-sm" onclick="encerrarContrato('${d.id}')">ENCERRAR / DEVOLVER</button></td>
+                            </tr>
+                        `;
+                    }
+
+                    // Lista Contratos Cancelados
+                    if(o.tipo === 'Aluguel' && o.status === 'Cancelado') {
+                         tbInativos.innerHTML += `<tr><td>${o.cliente}</td><td>${o.data}</td><td>R$ ${o.total}</td><td><span class="badge bg-cancelado">CANCELADO</span></td></tr>`;
+                    }
                 });
             });
-            onSnapshot(collection(db, "financeiro"), (snap) => { /* Atualização passiva */ });
+            onSnapshot(collection(db, "financeiro"), (snap) => { 
+                const tbRec = document.getElementById('lista-receber'); tbRec.innerHTML='';
+                snap.forEach(d => {
+                    const f = d.data();
+                    if(f.status==='Pendente' && f.tipo==='receita') {
+                        tbRec.innerHTML+=`<tr><td>${f.vencimento}</td><td>${f.cliente}</td><td>${f.descricao}</td><td>R$ ${f.valor}</td><td>A Vencer</td><td><button class="btn-green btn-sm" onclick="darBaixa('${d.id}')">Receber</button></td></tr>`;
+                    }
+                });
+            });
         }
 
-        // --- PREÇO EDITÁVEL ---
-        window.atualizarPreco = () => {
-            const id = document.getElementById('cart-sel').value;
-            if(id && estoqueMap[id]) document.getElementById('cart-preco').value = estoqueMap[id].venda;
-        };
+        // --- ENCERRAR CONTRATO (MÁGICA DO RETORNO AO ESTOQUE) ---
+        window.encerrarContrato = async (id) => {
+            if(!confirm("TEM CERTEZA? Isso vai:\n1. Cancelar o contrato.\n2. Devolver os itens ao estoque.\n3. Gerar multa (se houver).")) return;
+            
+            const docSnap = await getDoc(doc(db, "orcamentos", id));
+            const contrato = docSnap.data();
+            
+            // 1. Pergunta Multa
+            const multaStr = prompt("Valor da Multa Rescisória (R$)? Digite 0 se não houver.");
+            if(multaStr === null) return; // Cancelou
+            const multa = Number(multaStr);
 
-        window.addCart = () => {
-            const id = document.getElementById('cart-sel').value;
-            const qtd = Number(document.getElementById('cart-qtd').value);
-            const preco = Number(document.getElementById('cart-preco').value); // PEGA DO CAMPO EDITÁVEL
-            if(!id) return;
-            const p = estoqueMap[id];
-            carrinho.push({id, nome:p.nome, venda:preco, qtd, total:preco*qtd});
-            renderCart();
-        };
-
-        function renderCart() {
-            const tb = document.getElementById('cart-body'); tb.innerHTML=''; let s=0;
-            carrinho.forEach((i,x)=>{ s+=i.total; tb.innerHTML+=`<tr><td>${i.nome}</td><td>${i.qtd}</td><td>${i.venda}</td><td>${i.total}</td><td><button onclick="rm(${x})">X</button></td></tr>`});
-            window.totalProd=s; calcTotal();
-        }
-        window.rm=(x)=>{carrinho.splice(x,1);renderCart()};
-        window.calcTotal=()=>{document.getElementById('total-display').innerText="R$ "+((window.totalProd||0)+Number(document.getElementById('cli-serv').value)).toFixed(2)};
-
-        // --- ORÇAMENTO ---
-        window.novoOrcamento = () => { idEdicao=null; carrinho=[]; renderCart(); document.getElementById('form-orcamento').style.display='block'; document.getElementById('btn-aprovar').style.display='none'; document.querySelectorAll('#form-orcamento input').forEach(i=>i.value=''); document.getElementById('cli-obs').value=''; };
-        
-        window.editarPedido = async (id) => {
-            const d = (await getDoc(doc(db,"orcamentos",id))).data();
-            idEdicao=id; document.getElementById('form-orcamento').style.display='block';
-            document.getElementById('cli-nome').value=d.cliente;
-            document.getElementById('cli-doc').value=d.doc;
-            document.getElementById('cli-cep').value=d.end.cep;
-            document.getElementById('cli-rua').value=d.end.rua;
-            document.getElementById('cli-num').value=d.end.num;
-            document.getElementById('cli-bairro').value=d.end.bairro;
-            document.getElementById('cli-cidade').value=d.end.cidade;
-            document.getElementById('cli-tipo').value=d.tipo;
-            document.getElementById('cli-obs').value=d.obs || ''; // CARREGA OBS
-            document.getElementById('cli-serv').value=d.servico;
-            carrinho=d.itens; renderCart();
-            document.getElementById('btn-aprovar').style.display='block';
-        };
-
-        window.salvarRascunho = async () => {
-            const dados = pegarDados(); dados.status='Pendente';
-            if(idEdicao) await updateDoc(doc(db,"orcamentos",idEdicao), dados);
-            else { const ref=await addDoc(collection(db,"orcamentos"),dados); idEdicao=ref.id; document.getElementById('btn-aprovar').style.display='block'; }
-            alert("Salvo!");
-        };
-
-        // --- APROVAÇÃO COM PERGUNTAS (V11 Lógica Simplificada) ---
-        window.aprovarFinalizar = async () => {
-            if(!idEdicao) return alert("Salve antes");
-            const tipo = document.getElementById('cli-tipo').value;
-            const cliente = document.getElementById('cli-nome').value;
-            const total = (window.totalProd||0)+Number(document.getElementById('cli-serv').value);
-
-            // 1. BAIXAR ESTOQUE (SEMPRE)
-            for(let i of carrinho) await updateDoc(doc(db,"estoque",i.id),{qtd:increment(-i.qtd)});
-
-            // 2. FINANCEIRO COM PERGUNTAS
-            if(tipo === 'Venda') {
-                const parcelas = prompt(`Total: R$ ${total}\nQuantas parcelas? (Digite 1 para À Vista)`, "1");
-                if(!parcelas) return;
-                const dataVenc = prompt("Data do 1º Vencimento (AAAA-MM-DD):", new Date().toISOString().split('T')[0]);
-                
-                const qtd = Number(parcelas);
-                const valParc = total/qtd;
-                for(let i=0; i<qtd; i++) {
-                    let dt = new Date(dataVenc); dt.setMonth(dt.getMonth()+i);
-                    await addDoc(collection(db,"financeiro"),{
-                        tipo:'receita', cliente, descricao:`Venda Parc ${i+1}/${qtd}`, 
-                        valor:valParc, vencimento:dt.toISOString().split('T')[0], status:'Pendente'
-                    });
-                }
-            } else {
-                // ALUGUEL
-                const diaVenc = prompt("Qual dia do mês será o vencimento? (Ex: 10)", "10");
-                const impl = Number(document.getElementById('cli-serv').value);
-                const mensal = window.totalProd;
-                
-                // Implantação (Cobrança Única)
-                if(impl > 0) await addDoc(collection(db,"financeiro"),{tipo:'receita', cliente, descricao:'Implantação', valor:impl, vencimento:new Date().toISOString().split('T')[0], status:'Pendente'});
-                
-                // 1ª Mensalidade
-                await addDoc(collection(db,"financeiro"),{tipo:'receita', cliente, descricao:'Aluguel Mês 1', valor:mensal, vencimento:`${new Date().getFullYear()}-${new Date().getMonth()+1}-${diaVenc}`, status:'Pendente'});
+            // 2. Devolve Estoque
+            for (let item of contrato.itens) {
+                await updateDoc(doc(db, "estoque", item.id), { qtd: increment(item.qtd) });
             }
 
-            await updateDoc(doc(db,"orcamentos",idEdicao),{status:'Aprovado'});
-            alert("Aprovado! Financeiro gerado.");
-            document.getElementById('form-orcamento').style.display='none';
+            // 3. Gera Multa no Financeiro (se > 0)
+            if(multa > 0) {
+                const vencMulta = prompt("Data Vencimento da Multa:", new Date().toISOString().split('T')[0]);
+                await addDoc(collection(db, "financeiro"), {
+                    tipo: 'receita',
+                    cliente: contrato.cliente,
+                    descricao: 'Multa Rescisória - Cancelamento',
+                    valor: multa,
+                    vencimento: vencMulta,
+                    status: 'Pendente'
+                });
+            }
+
+            // 4. Muda Status
+            await updateDoc(doc(db, "orcamentos", id), { status: 'Cancelado' });
+
+            alert("Contrato Encerrado! Itens devolvidos ao estoque.");
         };
 
-        function pegarDados() {
-            return {
-                cliente: document.getElementById('cli-nome').value, doc: document.getElementById('cli-doc').value,
-                obs: document.getElementById('cli-obs').value, tipo: document.getElementById('cli-tipo').value,
-                end: {cep:document.getElementById('cli-cep').value, rua:document.getElementById('cli-rua').value, num:document.getElementById('cli-num').value, bairro:document.getElementById('cli-bairro').value, cidade:document.getElementById('cli-cidade').value},
-                itens: carrinho, servico: Number(document.getElementById('cli-serv').value),
-                total: (window.totalProd||0)+Number(document.getElementById('cli-serv').value),
-                data: new Date().toISOString().split('T')[0]
-            };
-        }
-
-        // --- OUTRAS FUNÇÕES (MANTIDAS DA V10) ---
-        window.cadastrarCatalogo = async () => { await addDoc(collection(db,"estoque"),{nome:document.getElementById('cat-nome').value, venda:Number(document.getElementById('cat-venda').value), custo:0, qtd:0}); alert("Cadastrado!"); };
-        window.lancarCompra = async () => { 
-            const id=document.getElementById('compra-sel').value; const custo=Number(document.getElementById('compra-custo').value); const qtd=Number(document.getElementById('compra-qtd').value);
-            await updateDoc(doc(db,"estoque",id),{qtd:increment(qtd), custo:custo});
-            await addDoc(collection(db,"financeiro"),{tipo:'compra_estoque', descricao:`Compra Estoque`, valor:custo*qtd, dataPagamento:document.getElementById('compra-data').value, status:'Pago'});
-            alert("Compra Lançada!");
-        };
-        window.filtrarFluxo = async () => { /* Mesma logica V10 */ const ini=document.getElementById('fluxo-ini').value; const fim=document.getElementById('fluxo-fim').value; const tb=document.getElementById('lista-fluxo'); tb.innerHTML=''; let ent=0, sai=0; const snap=await getDocs(collection(db,"financeiro")); snap.forEach(d=>{const f=d.data(); if(f.status==='Pago' && f.dataPagamento>=ini && f.dataPagamento<=fim){ if(f.tipo==='receita'){ent+=f.valor; tb.innerHTML+=`<tr><td>${f.dataPagamento}</td><td style="color:green">Entrada</td><td>${f.descricao}</td><td>${f.valor}</td><td>Pago</td></tr>`} else {sai+=f.valor; tb.innerHTML+=`<tr><td>${f.dataPagamento}</td><td style="color:red">Saída</td><td>${f.descricao}</td><td>${f.valor}</td><td>Pago</td></tr>`} }}); document.getElementById('kpi-ent').innerText=ent; document.getElementById('kpi-sai').innerText=sai; document.getElementById('kpi-saldo').innerText=ent-sai; };
-        window.filtrarReceber = async () => { /* Mesma logica V10 */ const ini=document.getElementById('rec-ini').value; const fim=document.getElementById('rec-fim').value; const tb=document.getElementById('lista-receber'); tb.innerHTML=''; const snap=await getDocs(collection(db,"financeiro")); snap.forEach(d=>{const f=d.data(); if(f.status==='Pendente' && f.vencimento>=ini && f.vencimento<=fim){ tb.innerHTML+=`<tr><td>${f.vencimento}</td><td>${f.cliente}</td><td>${f.valor}</td><td>Pendente</td><td><button onclick="darBaixa('${d.id}')">Receber</button></td></tr>`} }); };
-        window.darBaixa=async(id)=>{ const dt=prompt("Data?"); if(dt) await updateDoc(doc(db,"financeiro",id),{status:'Pago', dataPagamento:dt}); };
-        window.lancarDespesa=async()=>{ await addDoc(collection(db,"financeiro"),{tipo:'despesa', descricao:document.getElementById('desp-desc').value, valor:Number(document.getElementById('desp-valor').value), dataPagamento:document.getElementById('desp-data').value, status:'Pago'}); alert("Salvo"); };
-        window.buscarCep=async()=>{ const v=document.getElementById('cli-cep').value.replace(/\D/g,''); if(v.length===8){const r=await fetch(`https://viacep.com.br/ws/${v}/json/`); const d=await r.json(); if(!d.erro){document.getElementById('cli-rua').value=d.logradouro; document.getElementById('cli-bairro').value=d.bairro; document.getElementById('cli-cidade').value=d.localidade;}} };
+        // --- OUTRAS FUNÇÕES (MANTIDAS) ---
+        window.atualizarPreco=()=>{const id=document.getElementById('cart-sel').value; if(id&&estoqueMap[id])document.getElementById('cart-preco').value=estoqueMap[id].venda;};
+        window.addCart=()=>{const id=document.getElementById('cart-sel').value; const qtd=Number(document.getElementById('cart-qtd').value); const pr=Number(document.getElementById('cart-preco').value); if(!id)return; const p=estoqueMap[id]; carrinho.push({id,nome:p.nome,venda:pr,qtd,total:pr*qtd}); renderCart();};
+        function renderCart(){const tb=document.getElementById('cart-body'); tb.innerHTML=''; let s=0; carrinho.forEach((i,x)=>{s+=i.total; tb.innerHTML+=`<tr><td>${i.nome}</td><td>${i.qtd}</td><td>${i.venda}</td><td>${i.total}</td><td><button onclick="carrinho.splice(${x},1);renderCart()">X</button></td></tr>`}); window.totalProd=s; calcTotal();}
+        window.calcTotal=()=>{document.getElementById('total-display').innerText="R$ "+((window.totalProd||0)+Number(document.getElementById('cli-serv').value)).toFixed(2)};
         
-        window.gerarPDF = () => {
-            document.getElementById('pdf-cli').innerText=document.getElementById('cli-nome').value;
-            document.getElementById('pdf-doc').innerText=document.getElementById('cli-doc').value;
-            document.getElementById('pdf-end').innerText=document.getElementById('cli-rua').value;
-            document.getElementById('pdf-data').innerText=new Date().toLocaleDateString(); // Data Hoje
-            document.getElementById('pdf-obs').innerText=document.getElementById('cli-obs').value; // OBS
-            const tb=document.getElementById('pdf-body'); tb.innerHTML='';
-            carrinho.forEach(i=>tb.innerHTML+=`<tr><td>${i.nome}</td><td>${i.qtd}</td><td>${i.venda}</td><td>${i.total}</td></tr>`);
-            document.getElementById('pdf-total').innerText=document.getElementById('total-display').innerText.replace('R$ ','');
-            const el=document.getElementById('pdf-template'); el.style.display='block';
-            html2pdf(el).then(()=>el.style.display='none');
+        window.novoOrcamento=()=>{idEdicao=null; carrinho=[]; renderCart(); document.getElementById('form-orcamento').style.display='block'; document.getElementById('btn-aprovar').style.display='none'; document.querySelectorAll('#form-orcamento input').forEach(i=>i.value=''); document.getElementById('cli-obs').value='';};
+        window.editarPedido=async(id)=>{const d=(await getDoc(doc(db,"orcamentos",id))).data(); idEdicao=id; document.getElementById('form-orcamento').style.display='block'; document.getElementById('cli-nome').value=d.cliente; document.getElementById('cli-doc').value=d.doc; document.getElementById('cli-cep').value=d.end.cep; document.getElementById('cli-rua').value=d.end.rua; document.getElementById('cli-num').value=d.end.num; document.getElementById('cli-bairro').value=d.end.bairro; document.getElementById('cli-cidade').value=d.end.cidade; document.getElementById('cli-tipo').value=d.tipo; document.getElementById('cli-obs').value=d.obs||''; document.getElementById('cli-serv').value=d.servico; carrinho=d.itens; renderCart(); document.getElementById('btn-aprovar').style.display='block';};
+        window.salvarRascunho=async()=>{const dados=pegarDados(); dados.status='Pendente'; if(idEdicao) await updateDoc(doc(db,"orcamentos",idEdicao),dados); else {const ref=await addDoc(collection(db,"orcamentos"),dados); idEdicao=ref.id; document.getElementById('btn-aprovar').style.display='block';} alert("Salvo!");};
+
+        window.aprovarFinalizar=async()=>{
+            if(!idEdicao) return alert("Salve antes");
+            const tipo=document.getElementById('cli-tipo').value; const cliente=document.getElementById('cli-nome').value; const total=(window.totalProd||0)+Number(document.getElementById('cli-serv').value);
+            
+            for(let i of carrinho) await updateDoc(doc(db,"estoque",i.id),{qtd:increment(-i.qtd)});
+
+            if(tipo==='Venda'){
+                const parc=prompt("Quantas parcelas? (1 = À Vista)","1"); if(!parc)return;
+                const dt=prompt("1º Vencimento:", new Date().toISOString().split('T')[0]);
+                const qtd=Number(parc); const val=total/qtd;
+                for(let i=0;i<qtd;i++){let d=new Date(dt); d.setMonth(d.getMonth()+i); await addDoc(collection(db,"financeiro"),{tipo:'receita',cliente,descricao:`Venda Parc ${i+1}/${qtd}`,valor:val,vencimento:d.toISOString().split('T')[0],status:'Pendente'});}
+            } else {
+                const dia=prompt("Dia Vencimento Mensal (Ex: 10)","10");
+                const impl=Number(document.getElementById('cli-serv').value);
+                const men=window.totalProd;
+                if(impl>0) await addDoc(collection(db,"financeiro"),{tipo:'receita',cliente,descricao:'Implantação',valor:impl,vencimento:new Date().toISOString().split('T')[0],status:'Pendente'});
+                await addDoc(collection(db,"financeiro"),{tipo:'receita',cliente,descricao:'Aluguel Mês 1',valor:men,vencimento:`${new Date().getFullYear()}-${new Date().getMonth()+1}-${dia}`,status:'Pendente'});
+            }
+            await updateDoc(doc(db,"orcamentos",idEdicao),{status:'Aprovado'}); alert("Aprovado!"); document.getElementById('form-orcamento').style.display='none';
         };
+
+        function pegarDados(){return{cliente:document.getElementById('cli-nome').value, doc:document.getElementById('cli-doc').value, obs:document.getElementById('cli-obs').value, tipo:document.getElementById('cli-tipo').value, end:{cep:document.getElementById('cli-cep').value, rua:document.getElementById('cli-rua').value, num:document.getElementById('cli-num').value, bairro:document.getElementById('cli-bairro').value, cidade:document.getElementById('cli-cidade').value}, itens:carrinho, servico:Number(document.getElementById('cli-serv').value), total:(window.totalProd||0)+Number(document.getElementById('cli-serv').value), data:new Date().toISOString().split('T')[0]};}
+
+        window.cadastrarCatalogo=async()=>{await addDoc(collection(db,"estoque"),{nome:document.getElementById('cat-nome').value,venda:Number(document.getElementById('cat-venda').value),custo:0,qtd:0}); alert("Ok");};
+        window.lancarCompra=async()=>{const id=document.getElementById('compra-sel').value; const c=Number(document.getElementById('compra-custo').value); const q=Number(document.getElementById('compra-qtd').value); await updateDoc(doc(db,"estoque",id),{qtd:increment(q),custo:c}); await addDoc(collection(db,"financeiro"),{tipo:'compra',descricao:'Compra Estoque',valor:c*q,dataPagamento:document.getElementById('compra-data').value,status:'Pago'}); alert("Compra ok");};
+        
+        window.filtrarFluxo=async()=>{const ini=document.getElementById('fluxo-ini').value; const fim=document.getElementById('fluxo-fim').value; const tb=document.getElementById('lista-fluxo'); tb.innerHTML=''; let e=0,s=0; const snap=await getDocs(collection(db,"financeiro")); snap.forEach(d=>{const f=d.data(); if(f.status==='Pago'&&f.dataPagamento>=ini&&f.dataPagamento<=fim){if(f.tipo==='receita'){e+=f.valor;tb.innerHTML+=`<tr><td>${f.dataPagamento}</td><td style="color:green">Ent</td><td>${f.descricao}</td><td>${f.valor}</td><td>OK</td></tr>`}else{s+=f.valor;tb.innerHTML+=`<tr><td>${f.dataPagamento}</td><td style="color:red">Sai</td><td>${f.descricao}</td><td>${f.valor}</td><td>OK</td></tr>`}}}); document.getElementById('kpi-ent').innerText=e; document.getElementById('kpi-sai').innerText=s; document.getElementById('kpi-saldo').innerText=e-s;};
+        window.filtrarReceber=async()=>{const ini=document.getElementById('rec-ini').value; const fim=document.getElementById('rec-fim').value; const tb=document.getElementById('lista-receber'); tb.innerHTML=''; const snap=await getDocs(collection(db,"financeiro")); snap.forEach(d=>{const f=d.data(); if(f.status==='Pendente'&&f.vencimento>=ini&&f.vencimento<=fim){tb.innerHTML+=`<tr><td>${f.vencimento}</td><td>${f.cliente}</td><td>${f.valor}</td><td>Aberto</td><td><button onclick="darBaixa('${d.id}')">Receber</button></td></tr>`}});};
+        window.darBaixa=async(id)=>{const dt=prompt("Data?"); if(dt)await updateDoc(doc(db,"financeiro",id),{status:'Pago',dataPagamento:dt});};
+        window.lancarDespesa=async()=>{await addDoc(collection(db,"financeiro"),{tipo:'despesa',descricao:document.getElementById('desp-desc').value,valor:Number(document.getElementById('desp-valor').value),dataPagamento:document.getElementById('desp-data').value,status:'Pago'}); alert("Ok");};
+        window.buscarCep=async()=>{const v=document.getElementById('cli-cep').value.replace(/\D/g,''); if(v.length===8){const r=await fetch(`https://viacep.com.br/ws/${v}/json/`); const d=await r.json(); if(!d.erro){document.getElementById('cli-rua').value=d.logradouro; document.getElementById('cli-bairro').value=d.bairro; document.getElementById('cli-cidade').value=d.localidade;}}};
+        window.gerarPDF=()=>{document.getElementById('pdf-cli').innerText=document.getElementById('cli-nome').value; document.getElementById('pdf-doc').innerText=document.getElementById('cli-doc').value; document.getElementById('pdf-end').innerText=document.getElementById('cli-rua').value; document.getElementById('pdf-data').innerText=new Date().toLocaleDateString(); document.getElementById('pdf-obs').innerText=document.getElementById('cli-obs').value; const tb=document.getElementById('pdf-body'); tb.innerHTML=''; carrinho.forEach(i=>tb.innerHTML+=`<tr><td>${i.nome}</td><td>${i.qtd}</td><td>${i.venda}</td><td>${i.total}</td></tr>`); document.getElementById('pdf-total').innerText=document.getElementById('total-display').innerText.replace('R$ ',''); const el=document.getElementById('pdf-template'); el.style.display='block'; html2pdf(el).then(()=>el.style.display='none');};
         window.nav=(id)=>{document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');};
     </script>
 </body>
