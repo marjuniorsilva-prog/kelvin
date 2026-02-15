@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K.S SERVIÇO | Gestão V10.4 (Com Aluguel)</title>
+    <title>K.S SERVIÇO | Gestão V10.5 (Lógica Aluguel Corrigida)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -58,7 +58,7 @@
 </head>
 <body>
 
-    <div id="login-overlay"><div class="login-box"><h1 style="color:var(--accent)">K.S SERVIÇO</h1><p>Sistema V10.4</p><button class="btn-gold" onclick="loginGoogle()">Acessar</button></div></div>
+    <div id="login-overlay"><div class="login-box"><h1 style="color:var(--accent)">K.S SERVIÇO</h1><p>Sistema V10.5</p><button class="btn-gold" onclick="loginGoogle()">Acessar</button></div></div>
 
     <aside>
         <div class="brand">K.S SERVIÇO</div>
@@ -93,7 +93,7 @@
                     <div class="col"><label>Bairro</label><input type="text" id="cli-bairro"></div>
                     <div class="col"><label>Cidade</label><input type="text" id="cli-cidade"></div>
                     <div class="col"><label>Doc</label><input type="text" id="cli-doc"></div>
-                    <div class="col"><label>Tipo</label><select id="cli-tipo"><option value="Venda">Venda</option><option value="Aluguel">Aluguel</option></select></div>
+                    <div class="col"><label>Tipo</label><select id="cli-tipo" onchange="atualizarPreco()"><option value="Venda">Venda</option><option value="Aluguel">Aluguel</option></select></div>
                 </div>
                 
                 <div class="row">
@@ -140,8 +140,11 @@
             <div class="row">
                 <div class="col panel">
                     <h2>Cadastrar Produto</h2>
-                    <input type="text" id="cat-nome" placeholder="Nome"><br><br>
-                    <input type="number" id="cat-venda" placeholder="Venda"><br><br>
+                    <input type="text" id="cat-nome" placeholder="Nome do Produto"><br><br>
+                    <div class="row">
+                        <div class="col"><label>Preço Venda (R$)</label><input type="number" id="cat-venda" placeholder="Ex: 150.00"></div>
+                        <div class="col"><label>Preço Aluguel (R$)</label><input type="number" id="cat-aluguel" placeholder="Ex: 30.00"></div>
+                    </div>
                     <button class="btn-blue" style="width:100%" onclick="cadastrarCatalogo()">Cadastrar</button>
                 </div>
                 <div class="col panel" style="border-left: 5px solid red;">
@@ -213,12 +216,13 @@
         function iniciarApp() {
             onSnapshot(collection(db, "estoque"), (snap) => {
                 const sel = document.getElementById('cart-sel'); const selComp = document.getElementById('compra-sel'); const tb = document.getElementById('tb-estoque');
-                sel.innerHTML='<option value="">Selecione...</option>'; selComp.innerHTML='<option value="">...</option>'; tb.innerHTML='<thead><tr><th>Produto</th><th>Custo</th><th>Venda</th><th>Qtd</th></tr></thead><tbody>';
+                sel.innerHTML='<option value="">Selecione...</option>'; selComp.innerHTML='<option value="">...</option>'; tb.innerHTML='<thead><tr><th>Produto</th><th>Venda</th><th>Aluguel</th><th>Qtd</th></tr></thead><tbody>';
                 snap.forEach(d => {
                     const p=d.data(); estoqueMap[d.id]=p;
                     if(p.qtd>0) sel.innerHTML+=`<option value="${d.id}">${p.nome}</option>`;
                     selComp.innerHTML+=`<option value="${d.id}">${p.nome}</option>`;
-                    tb.innerHTML+=`<tr><td>${p.nome}</td><td>R$ ${p.custo}</td><td>R$ ${p.venda}</td><td>${p.qtd}</td></tr>`;
+                    // MOSTRA O PREÇO DE ALUGUEL NA TABELA DE ESTOQUE TAMBEM
+                    tb.innerHTML+=`<tr><td>${p.nome}</td><td>R$ ${p.venda}</td><td>R$ ${p.aluguel || 0}</td><td>${p.qtd}</td></tr>`;
                 });
             });
             onSnapshot(query(collection(db, "orcamentos"), orderBy("data", "desc")), (snap) => {
@@ -231,9 +235,10 @@
                     let btn = o.status==='Pendente' ? `<button class="btn-blue btn-sm" onclick="editarPedido('${d.id}')">Editar</button>` : 'Fechado';
                     tb.innerHTML += `<tr><td>${o.data}</td><td>${o.cliente}</td><td>R$ ${o.total.toFixed(2)}</td><td>${o.status}</td><td>${btn}</td></tr>`;
                     
-                    // ALUGUÉIS ATIVOS (O QUE FALTAVA)
                     if(o.tipo==='Aluguel' && o.status==='Aprovado'){
-                        tbContratos.innerHTML += `<tr><td>${o.cliente}</td><td>${o.data}</td><td>R$ ${o.total.toFixed(2)}/mês</td><td><button class="btn-red btn-sm" onclick="encerrarContrato('${d.id}')">ENCERRAR</button></td></tr>`;
+                        // MOSTRA QUE O VALOR MENSAL É SÓ DOS ITENS, SEM A INSTALAÇÃO
+                        let mensalidade = o.total - (o.servico || 0);
+                        tbContratos.innerHTML += `<tr><td>${o.cliente}</td><td>${o.data}</td><td>R$ ${mensalidade.toFixed(2)}/mês</td><td><button class="btn-red btn-sm" onclick="encerrarContrato('${d.id}')">ENCERRAR</button></td></tr>`;
                     }
                     if(o.tipo==='Aluguel' && o.status==='Cancelado'){
                         tbCancel.innerHTML += `<tr><td>${o.cliente}</td><td>${o.data}</td><td>Cancelado</td></tr>`;
@@ -251,38 +256,37 @@
             });
         }
 
-        // --- ENCERRAR CONTRATO (RETORNA ESTOQUE E GERA MULTA) ---
         window.encerrarContrato = async (id) => {
             if(!confirm("Encerrar contrato? Itens voltarão ao estoque.")) return;
             const docRef = doc(db, "orcamentos", id);
             const contrato = (await getDoc(docRef)).data();
-            
-            // 1. Devolve Estoque
-            for(let item of contrato.itens) {
-                await updateDoc(doc(db, "estoque", item.id), { qtd: increment(item.qtd) });
-            }
-
-            // 2. Multa
+            for(let item of contrato.itens) { await updateDoc(doc(db, "estoque", item.id), { qtd: increment(item.qtd) }); }
             const multaStr = prompt("Valor da Multa (R$)? (Deixe 0 se não tiver)", "0");
             const multa = Number(multaStr);
             if(multa > 0) {
                 const venc = prompt("Data Vencimento Multa:", new Date().toISOString().split('T')[0]);
-                await addDoc(collection(db, "financeiro"), {
-                    tipo: 'receita', cliente: contrato.cliente, descricao: 'Multa Cancelamento', valor: multa, vencimento: venc, status: 'Pendente'
-                });
+                await addDoc(collection(db, "financeiro"), { tipo: 'receita', cliente: contrato.cliente, descricao: 'Multa Cancelamento', valor: multa, vencimento: venc, status: 'Pendente' });
             }
-
-            await updateDoc(docRef, { status: 'Cancelado' });
-            alert("Contrato Encerrado!");
+            await updateDoc(docRef, { status: 'Cancelado' }); alert("Contrato Encerrado!");
         };
 
-        // --- PREÇO EDITÁVEL ---
-        window.atualizarPreco = () => { const id = document.getElementById('cart-sel').value; if(id && estoqueMap[id]) document.getElementById('cart-preco').value = estoqueMap[id].venda; };
+        // --- LÓGICA CORRIGIDA AQUI: PUXA O PREÇO CERTO ---
+        window.atualizarPreco = () => { 
+            const id = document.getElementById('cart-sel').value; 
+            const tipo = document.getElementById('cli-tipo').value; // VE SE É VENDA OU ALUGUEL
+            
+            if(id && estoqueMap[id]) {
+                // SE FOR ALUGUEL, TENTA PEGAR PREÇO DE ALUGUEL. SE NÃO TIVER, PEGA 0
+                // SE FOR VENDA, PEGA PREÇO DE VENDA.
+                let preco = tipo === 'Aluguel' ? (estoqueMap[id].aluguel || 0) : estoqueMap[id].venda;
+                document.getElementById('cart-preco').value = preco; 
+            }
+        };
+
         window.addCart = () => { const id = document.getElementById('cart-sel').value; const qtd = Number(document.getElementById('cart-qtd').value); const preco = Number(document.getElementById('cart-preco').value); if(!id) return; const p = estoqueMap[id]; carrinho.push({id, nome:p.nome, venda:preco, qtd, total:preco*qtd}); renderCart(); };
         function renderCart() { const tb = document.getElementById('cart-body'); tb.innerHTML=''; let s=0; carrinho.forEach((i,x)=>{ s+=i.total; tb.innerHTML+=`<tr><td>${i.nome}</td><td>${i.qtd}</td><td>${i.venda}</td><td>${i.total}</td><td><button onclick="carrinho.splice(${x},1);renderCart()">X</button></td></tr>`}); window.totalProd=s; calcTotal(); }
         window.calcTotal=()=>{document.getElementById('total-display').innerText="R$ "+((window.totalProd||0)+Number(document.getElementById('cli-serv').value)).toFixed(2)};
 
-        // --- ORÇAMENTO ---
         window.novoOrcamento = () => { idEdicao=null; carrinho=[]; renderCart(); document.getElementById('form-orcamento').style.display='block'; document.getElementById('btn-aprovar').style.display='none'; document.querySelectorAll('#form-orcamento input').forEach(i=>i.value=''); document.getElementById('cli-obs').value=''; };
         window.editarPedido = async (id) => { const d = (await getDoc(doc(db,"orcamentos",id))).data(); idEdicao=id; document.getElementById('form-orcamento').style.display='block'; document.getElementById('cli-nome').value=d.cliente; document.getElementById('cli-doc').value=d.doc; document.getElementById('cli-cep').value=d.end.cep; document.getElementById('cli-rua').value=d.end.rua; document.getElementById('cli-num').value=d.end.num; document.getElementById('cli-bairro').value=d.end.bairro; document.getElementById('cli-cidade').value=d.end.cidade; document.getElementById('cli-tipo').value=d.tipo; document.getElementById('cli-obs').value=d.obs||''; document.getElementById('cli-serv').value=d.servico; carrinho=d.itens; renderCart(); document.getElementById('btn-aprovar').style.display='block'; };
         window.salvarRascunho = async () => { const dados = pegarDados(); dados.status='Pendente'; if(idEdicao) await updateDoc(doc(db,"orcamentos",idEdicao), dados); else { const ref=await addDoc(collection(db,"orcamentos"),dados); idEdicao=ref.id; document.getElementById('btn-aprovar').style.display='block'; } alert("Salvo!"); };
@@ -291,16 +295,19 @@
             if(!idEdicao) return alert("Salve antes");
             const tipo=document.getElementById('cli-tipo').value; const cliente=document.getElementById('cli-nome').value; const total=(window.totalProd||0)+Number(document.getElementById('cli-serv').value);
             for(let i of carrinho) await updateDoc(doc(db,"estoque",i.id),{qtd:increment(-i.qtd)});
+            
             if(tipo==='Venda'){
                 const parc=prompt("Quantas parcelas? (1 = À Vista)","1"); if(!parc)return;
                 const dt=prompt("1º Vencimento:", new Date().toISOString().split('T')[0]);
                 const qtd=Number(parc); const val=total/qtd;
                 for(let i=0;i<qtd;i++){let d=new Date(dt); d.setMonth(d.getMonth()+i); await addDoc(collection(db,"financeiro"),{tipo:'receita',cliente,descricao:`Venda Parc ${i+1}/${qtd}`,valor:val,vencimento:d.toISOString().split('T')[0],status:'Pendente'});}
             } else {
+                // LÓGICA DE ALUGUEL CORRIGIDA: IMPLANTAÇÃO + MENSALIDADE
                 const dia=prompt("Dia Vencimento Mensal (Ex: 10)","10");
-                const impl=Number(document.getElementById('cli-serv').value);
-                const men=window.totalProd;
-                if(impl>0) await addDoc(collection(db,"financeiro"),{tipo:'receita',cliente,descricao:'Implantação',valor:impl,vencimento:new Date().toISOString().split('T')[0],status:'Pendente'});
+                const impl=Number(document.getElementById('cli-serv').value); // Mão de obra é taxa unica
+                const men=window.totalProd; // A soma dos itens agora está com preço de aluguel (ex: 5x30=150)
+                
+                if(impl>0) await addDoc(collection(db,"financeiro"),{tipo:'receita',cliente,descricao:'Implantação (Taxa Única)',valor:impl,vencimento:new Date().toISOString().split('T')[0],status:'Pendente'});
                 await addDoc(collection(db,"financeiro"),{tipo:'receita',cliente,descricao:'Aluguel Mês 1',valor:men,vencimento:`${new Date().getFullYear()}-${new Date().getMonth()+1}-${dia}`,status:'Pendente'});
             }
             await updateDoc(doc(db,"orcamentos",idEdicao),{status:'Aprovado'}); alert("Aprovado!"); document.getElementById('form-orcamento').style.display='none';
@@ -308,7 +315,6 @@
 
         function pegarDados(){return{cliente:document.getElementById('cli-nome').value, doc:document.getElementById('cli-doc').value, obs:document.getElementById('cli-obs').value, tipo:document.getElementById('cli-tipo').value, end:{cep:document.getElementById('cli-cep').value, rua:document.getElementById('cli-rua').value, num:document.getElementById('cli-num').value, bairro:document.getElementById('cli-bairro').value, cidade:document.getElementById('cli-cidade').value}, itens:carrinho, servico:Number(document.getElementById('cli-serv').value), total:(window.totalProd||0)+Number(document.getElementById('cli-serv').value), data:new Date().toISOString().split('T')[0]};}
 
-        // --- UTILS & PDF ---
         window.gerarPDF = () => {
             document.getElementById('pdf-cli').innerText=document.getElementById('cli-nome').value; document.getElementById('pdf-doc').innerText=document.getElementById('cli-doc').value; document.getElementById('pdf-end').innerText=document.getElementById('cli-rua').value; document.getElementById('pdf-data').innerText=new Date().toLocaleDateString(); document.getElementById('pdf-obs-view').innerText=document.getElementById('cli-obs').value;
             const tb=document.getElementById('pdf-body'); tb.innerHTML=''; carrinho.forEach(i=>tb.innerHTML+=`<tr><td>${i.nome}</td><td>${i.qtd}</td><td>${i.venda}</td><td>${i.total}</td></tr>`); document.getElementById('pdf-total').innerText=document.getElementById('total-display').innerText.replace('R$ ','');
@@ -316,7 +322,13 @@
             html2pdf().from(el).set({ margin: 10, filename: 'Orcamento_KS.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).save().then(() => { el.style.display = 'none'; });
         };
 
-        window.cadastrarCatalogo=async()=>{await addDoc(collection(db,"estoque"),{nome:document.getElementById('cat-nome').value,venda:Number(document.getElementById('cat-venda').value),custo:0,qtd:0}); alert("Ok");};
+        // SALVA O PREÇO DE ALUGUEL TAMBÉM
+        window.cadastrarCatalogo=async()=>{await addDoc(collection(db,"estoque"),{
+            nome:document.getElementById('cat-nome').value,
+            venda:Number(document.getElementById('cat-venda').value),
+            aluguel:Number(document.getElementById('cat-aluguel').value), // NOVO CAMPO
+            custo:0,qtd:0}); alert("Ok");
+        };
         window.lancarCompra=async()=>{const id=document.getElementById('compra-sel').value; const c=Number(document.getElementById('compra-custo').value); const q=Number(document.getElementById('compra-qtd').value); await updateDoc(doc(db,"estoque",id),{qtd:increment(q),custo:c}); await addDoc(collection(db,"financeiro"),{tipo:'compra',descricao:'Compra Estoque',valor:c*q,dataPagamento:document.getElementById('compra-data').value,status:'Pago'}); alert("Compra ok");};
         window.filtrarFluxo=async()=>{const ini=document.getElementById('fluxo-ini').value; const fim=document.getElementById('fluxo-fim').value; const tb=document.getElementById('lista-fluxo'); tb.innerHTML=''; let e=0,s=0; const snap=await getDocs(collection(db,"financeiro")); snap.forEach(d=>{const f=d.data(); if(f.status==='Pago'&&f.dataPagamento>=ini&&f.dataPagamento<=fim){if(f.tipo==='receita'){e+=f.valor;tb.innerHTML+=`<tr><td>${f.dataPagamento}</td><td style="color:green">Ent</td><td>${f.descricao}</td><td>${f.valor}</td><td>OK</td></tr>`}else{s+=f.valor;tb.innerHTML+=`<tr><td>${f.dataPagamento}</td><td style="color:red">Sai</td><td>${f.descricao}</td><td>${f.valor}</td><td>OK</td></tr>`}}}); document.getElementById('kpi-ent').innerText=e; document.getElementById('kpi-sai').innerText=s; document.getElementById('kpi-saldo').innerText=e-s;};
         window.filtrarReceber=async()=>{const ini=document.getElementById('rec-ini').value; const fim=document.getElementById('rec-fim').value; const tb=document.getElementById('lista-receber'); tb.innerHTML=''; const snap=await getDocs(collection(db,"financeiro")); snap.forEach(d=>{const f=d.data(); if(f.status==='Pendente'&&f.vencimento>=ini&&f.vencimento<=fim){tb.innerHTML+=`<tr><td>${f.vencimento}</td><td>${f.cliente}</td><td>${f.valor}</td><td>Aberto</td><td><button onclick="darBaixa('${d.id}')">Receber</button></td></tr>`}});};
