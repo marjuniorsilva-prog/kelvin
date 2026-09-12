@@ -1,0 +1,1 @@
+{"name":"ClimaAqui","short_name":"ClimaAqui","description":"Previsão do tempo, chuva, vento e alertas por localização.","start_url":"./","display":"standalone","background_color":"#f4f8fd","theme_color":"#0b67d8","icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}
